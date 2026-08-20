@@ -1,10 +1,11 @@
-import { POINTS_PER_OBJECT, LEVEL_UP_SCORE } from '../constants';
+import { POINTS_PER_OBJECT, LEVEL_UP_SCORE, INITIAL_LIVES } from '../constants';
 import type { GameStatus } from '../types';
 
 export class GameState {
   #score: number = 0;
   #highScore: number;
   #level: number = 0;
+  #lives: number = INITIAL_LIVES;
   #status: GameStatus = 'playing';
   #elapsedTime: number = 0;
 
@@ -16,6 +17,23 @@ export class GameState {
     this.#score += POINTS_PER_OBJECT;
     this.checkLevelUp();
     this.updateHighScore();
+  }
+
+  loseLife(): void {
+    if (this.#status !== 'playing') return;
+
+    this.#lives = Math.max(0, this.#lives - 1);
+    if (this.#lives === 0) {
+      this.#status = 'gameOver';
+    }
+  }
+
+  getLives(): number {
+    return this.#lives;
+  }
+
+  isGameOver(): boolean {
+    return this.#status === 'gameOver';
   }
 
   private checkLevelUp(): void {
@@ -80,6 +98,7 @@ export class GameState {
   reset(): void {
     this.#score = 0;
     this.#level = 0;
+    this.#lives = INITIAL_LIVES;
     this.#status = 'playing';
     this.#elapsedTime = 0;
   }

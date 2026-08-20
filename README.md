@@ -1,11 +1,13 @@
 # Rhino Game
 
-A browser-based game where players control a turtle to catch falling objects. Built with TypeScript and Canvas API for fast, fluid gameplay.
+A browser-based game where players control a turtle to catch falling objects. Built with
+TypeScript and the Canvas API.
 
 ## Quick Start
 
 ### Prerequisites
-- Node.js 18+ and npm (or pnpm/yarn)
+
+- Node.js 20+ and npm
 
 ### Installation
 
@@ -19,7 +21,7 @@ npm install
 npm run dev
 ```
 
-This starts a development server at `http://localhost:5173` with hot module reloading.
+Starts a dev server at `http://localhost:5173` with hot module reloading.
 
 ### Build
 
@@ -27,64 +29,80 @@ This starts a development server at `http://localhost:5173` with hot module relo
 npm run build
 ```
 
-Produces optimized production build in `dist/`.
+Typechecks, then writes an optimized production bundle to `dist/`.
 
 ### Testing
 
 ```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode
-npm run test:ui
+npm test              # single run
+npm run test:watch    # watch mode
+npm run test:coverage # with coverage report
+npm run test:mobile   # emulated Android touch checks (needs Chromium)
 ```
+
+### Before pushing
+
+```bash
+npm run ci
+```
+
+Runs the exact sequence CI runs: typecheck → lint → format check → tests with coverage → build.
 
 ## Game Controls
 
-- **A / Left Arrow**: Move turtle left
-- **D / Right Arrow**: Move turtle right
-- **P**: Pause/Resume game
-- **R**: Restart (when game over)
+**Desktop**
+
+| Key       | Action              |
+| --------- | ------------------- |
+| `A` / `←` | Move turtle left    |
+| `D` / `→` | Move turtle right   |
+| `P`       | Pause / resume      |
+| `R`       | Restart (game over) |
+
+**Phone / tablet**
+
+Drag anywhere on the board to steer the turtle, and use the on-screen **Pause** and **Restart**
+buttons.
+
+### Playing on your phone
+
+`npm run dev` binds to `0.0.0.0`, so Vite prints a second "Network" address. Open that one on a
+phone connected to the same Wi-Fi — `localhost` will not work from another device.
+
+## How to Play
+
+Catch falling objects for 10 points each. You start with **3 lives** — every object that
+reaches the bottom uncaught costs one. At zero lives the run ends. Fall speed increases every
+100 points, and the spawn rate climbs the longer you survive. High scores persist between
+sessions.
 
 ## Project Structure
 
-See [CLAUDE.md](./CLAUDE.md) for comprehensive architecture documentation and development guidelines.
-
 ```
+index.html               # Vite entry point (must stay at root)
 src/
-├── game/          # Game logic (Player, FallingObject, GameState, Game loop)
-├── input/         # Input handling (keyboard events)
-├── render/        # Rendering system (Canvas drawing)
-├── physics/       # Collision detection
-├── types.ts       # TypeScript type definitions
-├── constants.ts   # Game configuration constants
-└── app.ts         # Application entry point
-
-public/
-└── index.html     # HTML entry point
-
-styles/
-└── main.css       # Game styling
+├── game/                # Game loop, player, objects, state
+├── input/               # Keyboard handling
+├── render/              # Canvas renderer and drawers
+├── physics/             # Collision detection
+├── styles/              # CSS, bundled via app.ts
+└── app.ts               # Entry point
+docs/scrum/              # Sprint plans, reviews, product backlog
+.github/workflows/ci.yml # CI pipeline
 ```
 
-## Features
+See [CLAUDE.md](./CLAUDE.md) for architecture, conventions, and the development workflow.
 
-- Smooth player movement with keyboard controls
-- Progressive difficulty (increasing spawn rate and fall speed)
-- Collision detection
-- Score tracking with persistence
-- Pause/Resume functionality
-- Responsive canvas rendering
+## Continuous Integration
 
-## Development Workflow
+Every push and PR runs typecheck, lint, format check, tests with coverage, and a production
+build across Node 20.x and 22.x. See [`.github/workflows/ci.yml`](./.github/workflows/ci.yml).
 
-For AI assistants and developers, refer to [CLAUDE.md](./CLAUDE.md) for:
-- Architecture principles
-- Code conventions
-- Testing strategy
-- Common improvement areas
-- Debugging tips
+## Roadmap
+
+The prioritized product backlog lives at the bottom of the latest sprint document in
+[`docs/scrum/`](./docs/scrum/).
 
 ## License
 
-See LICENSE file for details.
+See [LICENSE](./LICENSE).

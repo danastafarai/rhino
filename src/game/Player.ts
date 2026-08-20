@@ -20,15 +20,31 @@ export class Player {
     };
   }
 
-  moveLeft(): void {
-    const newX = Math.max(0, this.#position.x - this.#speed);
-    this.#position.x = newX;
+  moveLeft(deltaTime: number): void {
+    this.#position.x = Math.max(0, this.#position.x - this.#speed * deltaTime);
   }
 
-  moveRight(): void {
+  moveRight(deltaTime: number): void {
     const maxX = this.#canvasWidth - this.#width;
-    const newX = Math.min(maxX, this.#position.x + this.#speed);
-    this.#position.x = newX;
+    this.#position.x = Math.min(maxX, this.#position.x + this.#speed * deltaTime);
+  }
+
+  /**
+   * Steer toward a target centre, capped at the same speed as the keyboard. Touch dragging uses
+   * this rather than snapping the turtle to the finger, so mobile is not strictly easier.
+   */
+  moveToward(targetCenterX: number, deltaTime: number): void {
+    const currentCenter = this.#position.x + this.#width / 2;
+    const delta = targetCenterX - currentCenter;
+    const maxStep = this.#speed * deltaTime;
+
+    if (Math.abs(delta) <= maxStep) {
+      this.#position.x = targetCenterX - this.#width / 2;
+    } else {
+      this.#position.x += Math.sign(delta) * maxStep;
+    }
+
+    this.#position.x = Math.min(this.#canvasWidth - this.#width, Math.max(0, this.#position.x));
   }
 
   getPosition(): Position {
