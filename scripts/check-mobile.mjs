@@ -55,28 +55,33 @@ const turtleFraction = (page) =>
     return count ? sum / count / width : null;
   });
 
-/** Dispatch a touch drag to an absolute client X, the way a thumb would. */
-const dragTo = (page, clientX) =>
-  page.evaluate((targetX) => {
-    const canvas = document.getElementById('gameCanvas');
-    const rect = canvas.getBoundingClientRect();
-    const y = rect.top + rect.height * 0.7;
-    const send = (type, x) =>
+/** Press and hold one side of the board, the way a thumb would, then release. */
+const holdSide = async (page, side, ms) => {
+  await page.evaluate(
+    ([whichSide]) => {
+      const canvas = document.getElementById('gameCanvas');
+      const rect = canvas.getBoundingClientRect();
+      const x = whichSide === 'left' ? rect.left + rect.width * 0.2 : rect.left + rect.width * 0.8;
       canvas.dispatchEvent(
-        new PointerEvent(type, {
+        new PointerEvent('pointerdown', {
           bubbles: true,
           cancelable: true,
           clientX: x,
-          clientY: y,
+          clientY: rect.top + rect.height * 0.5,
           pointerId: 1,
           pointerType: 'touch',
         })
       );
-    send('pointerdown', rect.left + rect.width / 2);
-    for (let i = 1; i <= 10; i++) {
-      send('pointermove', rect.left + rect.width / 2 + ((targetX - rect.width / 2) * i) / 10);
-    }
-  }, clientX);
+    },
+    [side]
+  );
+  await page.waitForTimeout(ms);
+  await page.evaluate(() => {
+    document
+      .getElementById('gameCanvas')
+      .dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerId: 1 }));
+  });
+};
 
 const server = spawn(
   process.platform === 'win32' ? 'npx.cmd' : 'npx',
@@ -131,18 +136,46 @@ try {
     check(name, 'canvas opts out of browser gestures', layout.touchAction === 'none');
     check(name, 'keyboard-only hints hidden on touch', !layout.keyHintShown);
 
+    // Steering must follow the side pressed, not the finger's absolute position.
     const start = await turtleFraction(page);
-    const box = await page.locator('#gameCanvas').boundingBox();
 
-    await dragTo(page, box.width - 4);
-    await page.waitForTimeout(1400);
-    const right = await turtleFraction(page);
-    check(name, 'drag right moves the turtle', start !== null && right > start + 0.1);
+    await holdSide(page, 'right', 1200);
+    const afterRight = await turtleFraction(page);
+    check(
+      name,
+      'holding the RIGHT side moves the turtle right',
+      start !== null && afterRight > start + 0.05,
+      `${start?.toFixed(2)} -> ${afterRight?.toFixed(2)}`
+    );
 
-    await dragTo(page, 4);
-    await page.waitForTimeout(1400);
-    const left = await turtleFraction(page);
-    check(name, 'drag left moves the turtle', left !== null && left < right - 0.1);
+    await holdSide(page, 'left', 1600);
+    const afterLeft = await turtleFraction(page);
+    check(
+      name,
+      'holding the LEFT side moves the turtle left',
+      afterLeft !== null && afterLeft < afterRight - 0.05,
+      `${afterRight?.toFixed(2)} -> ${afterLeft?.toFixed(2)}`
+    );
+
+    // A press on the left half must steer left even though the finger sits right of the turtle.
+    await holdSide(page, 'left', 900);
+    const stillLeft = await turtleFraction(page);
+    check(
+      name,
+      'direction follows the side pressed, not the finger position',
+      stillLeft !== null && stillLeft <= afterLeft + 0.02,
+      `${afterLeft?.toFixed(2)} -> ${stillLeft?.toFixed(2)}`
+    );
+
+    await page.waitForTimeout(200);
+    const idle = await turtleFraction(page);
+    await page.waitForTimeout(600);
+    const stillIdle = await turtleFraction(page);
+    check(
+      name,
+      'turtle stops when the press is released',
+      idle !== null && Math.abs(stillIdle - idle) < 0.01
+    );
 
     const pauseBefore = await page.locator('#pauseButton').textContent();
     await page.locator('#pauseButton').tap();

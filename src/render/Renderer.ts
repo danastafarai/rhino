@@ -2,7 +2,9 @@ import type { Player } from '../game/Player';
 import type { FallingObject } from '../game/FallingObject';
 import type { GameState } from '../game/GameState';
 import { GAME_CONFIG } from '../constants';
+import type { SteerDirection } from '../input/steering';
 import { drawPlayer } from './drawers/drawPlayer';
+import { drawTouchZones } from './drawers/drawTouchZones';
 import { drawObjects } from './drawers/drawObjects';
 import { drawUI } from './drawers/drawUI';
 
@@ -38,7 +40,12 @@ export class Renderer {
     }
   }
 
-  render(player: Player, objects: FallingObject[], gameState: GameState): void {
+  render(
+    player: Player,
+    objects: FallingObject[],
+    gameState: GameState,
+    steerDirection: SteerDirection = 0
+  ): void {
     this.syncToDisplaySize();
 
     const scaleX = this.#canvas.width / GAME_CONFIG.canvasWidth;
@@ -48,6 +55,7 @@ export class Renderer {
     this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
     this.#ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0);
 
+    drawTouchZones(this.#ctx, steerDirection, GAME_CONFIG.canvasWidth, GAME_CONFIG.canvasHeight);
     drawPlayer(this.#ctx, player);
     drawObjects(this.#ctx, objects);
     drawUI(this.#ctx, gameState, GAME_CONFIG.canvasWidth, GAME_CONFIG.canvasHeight);

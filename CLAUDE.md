@@ -7,7 +7,7 @@
 ### Game Mechanics
 
 - **Player Control**: Move a turtle left and right across the bottom of the screen — keyboard
-  on desktop, drag anywhere on the board on touch devices
+  on desktop; on touch, hold the left or right half of the board to steer that way
 - **Objective**: Catch falling objects to score points
 - **Lives**: Start with 3; every object that reaches the bottom uncaught costs one
 - **Game Over**: Triggered at zero lives; `R` restarts
@@ -28,7 +28,7 @@ pushing — it is the exact sequence CI runs.
 | `npm run typecheck`     | `tsc --noEmit` over src/ **and** vite.config.ts |
 | `npm run lint`          | ESLint over src/ and scripts/, 0 warnings       |
 | `npm run format:check`  | Prettier verification (`npm run format` writes) |
-| `npm test`              | Vitest, single run — 61 tests                   |
+| `npm test`              | Vitest, single run — 62 tests                   |
 | `npm run test:watch`    | Vitest in watch mode                            |
 | `npm run test:coverage` | Vitest with v8 coverage report                  |
 | `npm run build`         | Typecheck, then production bundle into `dist/`  |
@@ -129,8 +129,14 @@ and import CSS from TypeScript rather than linking it, so Vite bundles and hashe
     once on key release.
   - **Pointer/touch** is polled too: `getPointerFraction()` returns where the finger is across
     the play surface as 0–1, or `null` when nothing is pressed. It reports a _fraction_, not a
-    pixel, so `InputHandler` stays free of canvas geometry and the caller maps it into the
-    logical space.
+    pixel, so `InputHandler` stays free of canvas geometry and the caller maps it into meaning.
+- `steering.ts` turns that fraction into a `SteerDirection` (-1/0/1): **the left half steers
+  left, the right half steers right, for as long as the press is held.** It is a pure function
+  precisely because `Game` is untested — putting the policy in `Game` would leave the control
+  model uncovered. Touch outranks the keyboard when both are active: a press names a direction
+  outright, so a stale held key must not fight the finger.
+- Deliberately **no dead zone** at the centre. A neutral band creates an invisible region where
+  pressing does nothing, which reads as an unresponsive game rather than a designed gap.
 - Takes an `EventTarget` for keys and an optional `HTMLElement` as the pointer surface, so tests
   can dispatch real `KeyboardEvent`s and `PointerEvent`s without touching globals.
 - `destroy()` unregisters every listener; handlers are bound class fields so the removal matches.
@@ -335,6 +341,12 @@ Two traps that already cost a sprint:
    `position: relative` `#stage` so it cannot influence its parent's height.
 2. **The play surface needs `touch-action: none`.** Without it the browser claims the drag as a
    scroll and the turtle never moves.
+
+**Touch steering is directional, not positional.** Holding a side moves the turtle that way at
+the keyboard's speed; it does not jump to the finger. That keeps the thumb clear of the turtle
+and stops touch being strictly easier than desktop. Any on-canvas affordance must point the way
+the turtle actually travels — a chevron shipped mirrored once, and the movement tests all passed
+because they check position, never iconography.
 
 **Every control needs a touch path.** The game shipped keyboard-only once and was completely
 unplayable on a phone while every test passed. Anything reachable only by keypress must also be

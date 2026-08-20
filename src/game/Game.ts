@@ -3,6 +3,8 @@ import { FallingObject } from './FallingObject';
 import { GameState } from './GameState';
 import type { InputAction } from '../input/InputHandler';
 import { InputHandler } from '../input/InputHandler';
+import type { SteerDirection } from '../input/steering';
+import { steerDirectionFromFraction } from '../input/steering';
 import { Renderer } from '../render/Renderer';
 import { findCollisions } from '../physics/Collision';
 import {
@@ -75,8 +77,10 @@ export class Game {
     const deltaTime = Math.min((currentTime - this.#lastFrameTime) / 1000, MAX_FRAME_DELTA);
     this.#lastFrameTime = currentTime;
 
-    this.update(deltaTime);
-    this.#renderer.render(this.#player, this.#objects, this.#gameState);
+    const steerDirection = steerDirectionFromFraction(this.#inputHandler.getPointerFraction());
+
+    this.update(deltaTime, steerDirection);
+    this.#renderer.render(this.#player, this.#objects, this.#gameState, steerDirection);
 
     for (const listener of this.#frameListeners) {
       listener(this.#gameState);
@@ -85,10 +89,10 @@ export class Game {
     requestAnimationFrame(this.gameLoop);
   };
 
-  private update(deltaTime: number): void {
+  private update(deltaTime: number, steerDirection: SteerDirection): void {
     if (!this.#gameState.isPlaying()) return;
 
-    this.movePlayer(deltaTime);
+    this.movePlayer(deltaTime, steerDirection);
     this.#gameState.updateElapsedTime(deltaTime);
     this.spawnObjects(deltaTime);
     this.updateObjects(deltaTime);
@@ -97,11 +101,15 @@ export class Game {
     this.updateDifficulty();
   }
 
-  private movePlayer(deltaTime: number): void {
-    const pointerFraction = this.#inputHandler.getPointerFraction();
-
-    if (pointerFraction !== null) {
-      this.#player.moveToward(pointerFraction * GAME_CONFIG.canvasWidth, deltaTime);
+  // Touch takes priority over keys: a press names a direction outright, so there is nothing to
+  // combine and letting a stale held key fight the finger would feel broken.
+  private movePlayer(deltaTime: number, steerDirection: SteerDirection): void {
+    if (steerDirection === -1) {
+      this.#player.moveLeft(deltaTime);
+      return;
+    }
+    if (steerDirection === 1) {
+      this.#player.moveRight(deltaTime);
       return;
     }
 
