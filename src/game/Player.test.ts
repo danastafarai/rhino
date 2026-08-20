@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { Player } from './Player';
 import { GAME_CONFIG } from '../constants';
 
+const FRAME = 1 / 60;
 const CANVAS_WIDTH = 800;
 const CANVAS_HEIGHT = 600;
 
@@ -25,22 +26,22 @@ describe('Player', () => {
     const player = createPlayer();
     const startX = player.getPosition().x;
 
-    player.moveLeft();
-    expect(player.getPosition().x).toBe(startX - GAME_CONFIG.playerSpeed);
+    player.moveLeft(FRAME);
+    expect(player.getPosition().x).toBe(startX - GAME_CONFIG.playerSpeed * FRAME);
   });
 
   it('should move right by the configured speed', () => {
     const player = createPlayer();
     const startX = player.getPosition().x;
 
-    player.moveRight();
-    expect(player.getPosition().x).toBe(startX + GAME_CONFIG.playerSpeed);
+    player.moveRight(FRAME);
+    expect(player.getPosition().x).toBe(startX + GAME_CONFIG.playerSpeed * FRAME);
   });
 
   it('should not move past the left edge', () => {
     const player = createPlayer();
     for (let i = 0; i < 500; i++) {
-      player.moveLeft();
+      player.moveLeft(FRAME);
     }
     expect(player.getPosition().x).toBe(0);
   });
@@ -48,9 +49,31 @@ describe('Player', () => {
   it('should not move past the right edge', () => {
     const player = createPlayer();
     for (let i = 0; i < 500; i++) {
-      player.moveRight();
+      player.moveRight(FRAME);
     }
     expect(player.getPosition().x).toBe(CANVAS_WIDTH - GAME_CONFIG.playerSize);
+  });
+
+  it('should travel the same distance per second regardless of frame rate', () => {
+    const at60fps = createPlayer();
+    for (let i = 0; i < 60; i++) {
+      at60fps.moveRight(1 / 60);
+    }
+
+    const at144fps = createPlayer();
+    for (let i = 0; i < 144; i++) {
+      at144fps.moveRight(1 / 144);
+    }
+
+    expect(at144fps.getPosition().x).toBeCloseTo(at60fps.getPosition().x, 6);
+  });
+
+  it('should move at the configured pixels-per-second rate', () => {
+    const player = createPlayer();
+    const startX = player.getPosition().x;
+
+    player.moveRight(1);
+    expect(player.getPosition().x).toBeCloseTo(startX + GAME_CONFIG.playerSpeed, 6);
   });
 
   it('should expose bounds matching its position and size', () => {

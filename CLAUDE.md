@@ -27,7 +27,7 @@ pushing — it is the exact sequence CI runs.
 | `npm run typecheck`     | `tsc --noEmit`                                  |
 | `npm run lint`          | ESLint, fails on any warning                    |
 | `npm run format:check`  | Prettier verification (`npm run format` writes) |
-| `npm test`              | Vitest, single run — 27 tests                   |
+| `npm test`              | Vitest, single run — 48 tests                   |
 | `npm run test:watch`    | Vitest in watch mode                            |
 | `npm run test:coverage` | Vitest with v8 coverage report                  |
 | `npm run build`         | Typecheck, then production bundle into `dist/`  |
@@ -90,9 +90,15 @@ and import CSS from TypeScript rather than linking it, so Vite bundles and hashe
 
 #### Input (`src/input/`)
 
-- **InputHandler.ts**: Converts keyboard events into `InputAction` values
-- Actions: `'moveLeft' | 'moveRight' | 'togglePause' | 'restart'`
-- Held keys drive movement each frame; `togglePause` and `restart` fire once on key release
+- **InputHandler.ts**: Owns all keyboard state. Two distinct shapes:
+  - **Continuous** movement is _polled_: `isMovingLeft()` / `isMovingRight()` report whether a
+    key is currently held. `Game` polls these each frame and scales by delta time. Movement
+    must never be an event callback — a callback fires once per keypress, not per frame, so it
+    cannot be delta-scaled.
+  - **Discrete** actions are _pushed_ via `InputAction` (`'togglePause' | 'restart'`), fired
+    once on key release.
+- Takes an `EventTarget` (defaults to `window`) so tests can dispatch real `KeyboardEvent`s.
+- `destroy()` unregisters both listeners; handlers are bound class fields so the removal matches.
 - All key handling lives here — never attach game key listeners in `app.ts`
 
 #### Rendering (`src/render/`)
@@ -276,6 +282,28 @@ disabled by a misspelled rule name — all of which one `npm install && npm run 
 5. Check Win/Lose Conditions
 ```
 
+### Frame-Rate Independence (non-negotiable)
+
+**Every rate in this codebase is per second, and every consumer multiplies by `deltaTime`.**
+Never write `position += speed` — write `position += speed * deltaTime`.
+
+The original build added a fixed amount per frame, which meant the game ran 2.4× faster on a
+144 Hz monitor than on a 60 Hz one. Anything that moves, falls, or spawns takes `deltaTime`:
+
+```typescript
+player.moveRight(deltaTime); // px/second
+object.update(deltaTime); // px/second
+this.#spawnAccumulator += this.#spawnRate * deltaTime; // objects/second
+```
+
+`Game` clamps each frame to `MAX_FRAME_DELTA` (0.1s). A backgrounded tab hands back a
+multi-second delta on its first frame; without the ceiling every object would teleport past the
+player and drain all three lives at once. The spawn accumulator drains in a `while` loop rather
+than an `if`, so a long frame still spawns the right number of objects.
+
+When adding anything time-based, add a test asserting equal travel at two different frame
+rates — `Player.test.ts` and `FallingObject.test.ts` both have one to copy.
+
 ### Collision Detection
 
 - Use Axis-Aligned Bounding Box (AABB) for simplicity and performance
@@ -344,18 +372,20 @@ environment (needed for `localStorage` in `GameState`).
 
 ### Current coverage
 
-| Module                 | Lines | Covered by                                         |
-| ---------------------- | ----- | -------------------------------------------------- |
-| `GameState.ts`         | 100%  | Score, level, lives, game over, reset, persistence |
-| `Player.ts`            | 100%  | Movement, both bounds, defensive position copy     |
-| `Collision.ts`         | 100%  | Overlap, adjacency, containment                    |
-| `constants.ts`         | 100%  | —                                                  |
-| `Game.ts`              | 0%    | Needs a loop harness with fake timers              |
-| `InputHandler.ts`      | 0%    | Needs DOM event simulation                         |
-| `Renderer.ts`, drawers | 0%    | Needs a canvas 2D context mock                     |
+| Module                 | Lines | Covered by                                            |
+| ---------------------- | ----- | ----------------------------------------------------- |
+| `GameState.ts`         | 100%  | Score, level, lives, game over, reset, persistence    |
+| `Player.ts`            | 100%  | Movement, both bounds, frame-rate independence        |
+| `FallingObject.ts`     | 100%  | Spawn bounds, sizing, fall rate, off-screen boundary  |
+| `InputHandler.ts`      | 100%  | Held keys, discrete actions, preventDefault, teardown |
+| `Collision.ts`         | 100%  | Overlap, adjacency, containment                       |
+| `constants.ts`         | 100%  | —                                                     |
+| `Game.ts`              | 0%    | Needs a loop harness with fake timers                 |
+| `Renderer.ts`, drawers | 0%    | Needs a canvas 2D context mock                        |
 
-Pure logic is fully covered. The gaps are all modules bound to browser APIs — closing them is
-the top product-backlog item.
+Everything that can be tested without a canvas is now covered. The two remaining gaps both
+need a rendering harness: `Game` needs fake timers around `requestAnimationFrame`, and
+`Renderer`/drawers need a mocked 2D context.
 
 ### Unit Tests
 

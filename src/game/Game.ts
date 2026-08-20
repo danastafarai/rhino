@@ -10,6 +10,7 @@ import {
   SPAWN_RATE_INCREASE_PER_SECOND,
   SPAWN_RATE_MAX,
   GRAVITY_INCREASE_PER_LEVEL,
+  MAX_FRAME_DELTA,
 } from '../constants';
 
 export class Game {
@@ -20,7 +21,7 @@ export class Game {
   #renderer: Renderer;
   #lastFrameTime: number = 0;
   #spawnRate: number = GAME_CONFIG.initialSpawnRate;
-  #spawnCounter: number = 0;
+  #spawnAccumulator: number = 0;
   #currentGravity: number = GAME_CONFIG.gravity;
   #lastLevel: number = 0;
   #running: boolean = true;
@@ -32,34 +33,21 @@ export class Game {
     this.#inputHandler = new InputHandler();
     this.#renderer = new Renderer(canvasElement);
 
-    this.setupCanvas(canvasElement);
-    this.setupInput();
-  }
-
-  private setupCanvas(canvasElement: HTMLCanvasElement): void {
     canvasElement.width = GAME_CONFIG.canvasWidth;
     canvasElement.height = GAME_CONFIG.canvasHeight;
+
+    this.#inputHandler.setCallback((action: InputAction) => this.handleAction(action));
   }
 
-  private setupInput(): void {
-    this.#inputHandler.setCallback((action: InputAction) => this.handleInput(action));
-  }
-
-  private handleInput(action: InputAction): void {
-    if (action === 'moveLeft') {
-      this.#player.moveLeft();
-    } else if (action === 'moveRight') {
-      this.#player.moveRight();
-    } else if (action === 'togglePause') {
+  private handleAction(action: InputAction): void {
+    if (action === 'togglePause') {
       if (this.#gameState.isPlaying()) {
         this.#gameState.setStatus('paused');
       } else if (this.#gameState.isPaused()) {
         this.#gameState.setStatus('playing');
       }
-    } else if (action === 'restart') {
-      if (this.#gameState.isGameOver()) {
-        this.reset();
-      }
+    } else if (action === 'restart' && this.#gameState.isGameOver()) {
+      this.reset();
     }
   }
 
@@ -69,16 +57,15 @@ export class Game {
 
   start(): void {
     this.#lastFrameTime = performance.now();
-    this.gameLoop(this.#lastFrameTime);
+    requestAnimationFrame(this.gameLoop);
   }
 
   private gameLoop = (currentTime: number): void => {
     if (!this.#running) return;
 
-    const deltaTime = (currentTime - this.#lastFrameTime) / 1000;
+    const deltaTime = Math.min((currentTime - this.#lastFrameTime) / 1000, MAX_FRAME_DELTA);
     this.#lastFrameTime = currentTime;
 
-    this.#inputHandler.update();
     this.update(deltaTime);
     this.#renderer.render(this.#player, this.#objects, this.#gameState);
 
@@ -92,28 +79,38 @@ export class Game {
   private update(deltaTime: number): void {
     if (!this.#gameState.isPlaying()) return;
 
+    this.movePlayer(deltaTime);
     this.#gameState.updateElapsedTime(deltaTime);
-    this.spawnObjects();
-    this.updateObjects();
+    this.spawnObjects(deltaTime);
+    this.updateObjects(deltaTime);
     this.checkCollisions();
     this.removeOffScreenObjects();
     this.updateDifficulty();
   }
 
-  private spawnObjects(): void {
-    this.#spawnCounter += this.#spawnRate;
-
-    if (this.#spawnCounter >= 1) {
-      this.#objects.push(
-        new FallingObject(GAME_CONFIG.canvasWidth, GAME_CONFIG.canvasHeight, this.#currentGravity)
-      );
-      this.#spawnCounter -= 1;
+  private movePlayer(deltaTime: number): void {
+    if (this.#inputHandler.isMovingLeft()) {
+      this.#player.moveLeft(deltaTime);
+    }
+    if (this.#inputHandler.isMovingRight()) {
+      this.#player.moveRight(deltaTime);
     }
   }
 
-  private updateObjects(): void {
+  private spawnObjects(deltaTime: number): void {
+    this.#spawnAccumulator += this.#spawnRate * deltaTime;
+
+    while (this.#spawnAccumulator >= 1) {
+      this.#objects.push(
+        new FallingObject(GAME_CONFIG.canvasWidth, GAME_CONFIG.canvasHeight, this.#currentGravity)
+      );
+      this.#spawnAccumulator -= 1;
+    }
+  }
+
+  private updateObjects(deltaTime: number): void {
     for (const obj of this.#objects) {
-      obj.update();
+      obj.update(deltaTime);
     }
   }
 
@@ -166,7 +163,7 @@ export class Game {
     this.#objects = [];
     this.#gameState.reset();
     this.#spawnRate = GAME_CONFIG.initialSpawnRate;
-    this.#spawnCounter = 0;
+    this.#spawnAccumulator = 0;
     this.#currentGravity = GAME_CONFIG.gravity;
     this.#lastLevel = 0;
   }

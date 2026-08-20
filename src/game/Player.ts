@@ -20,15 +20,13 @@ export class Player {
     };
   }
 
-  moveLeft(): void {
-    const newX = Math.max(0, this.#position.x - this.#speed);
-    this.#position.x = newX;
+  moveLeft(deltaTime: number): void {
+    this.#position.x = Math.max(0, this.#position.x - this.#speed * deltaTime);
   }
 
-  moveRight(): void {
+  moveRight(deltaTime: number): void {
     const maxX = this.#canvasWidth - this.#width;
-    const newX = Math.min(maxX, this.#position.x + this.#speed);
-    this.#position.x = newX;
+    this.#position.x = Math.min(maxX, this.#position.x + this.#speed * deltaTime);
   }
 
   getPosition(): Position {

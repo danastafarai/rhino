@@ -28,8 +28,9 @@ export class FallingObject {
     };
   }
 
-  update(): void {
-    this.#position.y += this.#velocity.y;
+  update(deltaTime: number): void {
+    this.#position.x += this.#velocity.x * deltaTime;
+    this.#position.y += this.#velocity.y * deltaTime;
   }
 
   isOffScreen(): boolean {
