@@ -37,6 +37,7 @@ Typechecks, then writes an optimized production bundle to `dist/`.
 npm test              # single run
 npm run test:watch    # watch mode
 npm run test:coverage # with coverage report
+npm run test:mobile   # emulated Android touch checks (needs Chromium)
 ```
 
 ### Before pushing
@@ -49,12 +50,24 @@ Runs the exact sequence CI runs: typecheck → lint → format check → tests w
 
 ## Game Controls
 
+**Desktop**
+
 | Key       | Action              |
 | --------- | ------------------- |
 | `A` / `←` | Move turtle left    |
 | `D` / `→` | Move turtle right   |
 | `P`       | Pause / resume      |
 | `R`       | Restart (game over) |
+
+**Phone / tablet**
+
+Drag anywhere on the board to steer the turtle, and use the on-screen **Pause** and **Restart**
+buttons.
+
+### Playing on your phone
+
+`npm run dev` binds to `0.0.0.0`, so Vite prints a second "Network" address. Open that one on a
+phone connected to the same Wi-Fi — `localhost` will not work from another device.
 
 ## How to Play
 

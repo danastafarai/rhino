@@ -76,6 +76,46 @@ describe('Player', () => {
     expect(player.getPosition().x).toBeCloseTo(startX + GAME_CONFIG.playerSpeed, 6);
   });
 
+  it('should steer toward a target without exceeding its speed', () => {
+    const player = createPlayer();
+    const startX = player.getPosition().x;
+
+    player.moveToward(CANVAS_WIDTH, 1 / 60);
+
+    const travelled = player.getPosition().x - startX;
+    expect(travelled).toBeCloseTo(GAME_CONFIG.playerSpeed / 60, 6);
+  });
+
+  it('should not overshoot a target within reach', () => {
+    const player = createPlayer();
+    const target = player.getPosition().x + GAME_CONFIG.playerSize / 2 + 2;
+
+    player.moveToward(target, 1);
+
+    const center = player.getPosition().x + GAME_CONFIG.playerSize / 2;
+    expect(center).toBeCloseTo(target, 6);
+  });
+
+  it('should clamp steering to the canvas bounds', () => {
+    const player = createPlayer();
+
+    player.moveToward(-500, 5);
+    expect(player.getPosition().x).toBe(0);
+
+    player.moveToward(CANVAS_WIDTH + 500, 5);
+    expect(player.getPosition().x).toBe(CANVAS_WIDTH - GAME_CONFIG.playerSize);
+  });
+
+  it('should steer the same distance per second regardless of frame rate', () => {
+    const coarse = createPlayer();
+    for (let i = 0; i < 30; i++) coarse.moveToward(CANVAS_WIDTH, 1 / 30);
+
+    const fine = createPlayer();
+    for (let i = 0; i < 120; i++) fine.moveToward(CANVAS_WIDTH, 1 / 120);
+
+    expect(fine.getPosition().x).toBeCloseTo(coarse.getPosition().x, 6);
+  });
+
   it('should expose bounds matching its position and size', () => {
     const player = createPlayer();
     const pos = player.getPosition();

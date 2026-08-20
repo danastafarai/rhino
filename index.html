@@ -2,7 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#5b5bd6" />
     <title>Rhino - Catch the Objects</title>
   </head>
   <body>
@@ -11,18 +12,27 @@
         <h1>Rhino Game</h1>
       </header>
       <main>
-        <canvas id="gameCanvas"></canvas>
+        <div id="stage">
+          <canvas id="gameCanvas"></canvas>
+        </div>
         <div id="ui">
           <div class="score-display">
             <span>Score: <strong id="score">0</strong></span>
             <span>Lives: <strong id="lives">3</strong></span>
             <span>High Score: <strong id="highScore">0</strong></span>
           </div>
+          <div class="touch-controls">
+            <button type="button" id="pauseButton" aria-label="Pause or resume">Pause</button>
+            <button type="button" id="restartButton" aria-label="Restart game">Restart</button>
+          </div>
           <div class="controls">
-            <p>
+            <p class="hint-touch">Drag anywhere on the board to move the turtle</p>
+            <p class="hint-keys">
               Use <strong>A</strong> and <strong>D</strong> or <strong>Arrow Keys</strong> to move
             </p>
-            <p>Press <strong>P</strong> to pause, <strong>R</strong> to restart</p>
+            <p class="hint-keys">
+              Press <strong>P</strong> to pause, <strong>R</strong> to restart
+            </p>
           </div>
         </div>
       </main>

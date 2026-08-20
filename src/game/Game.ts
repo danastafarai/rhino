@@ -30,13 +30,22 @@ export class Game {
   constructor(canvasElement: HTMLCanvasElement) {
     this.#player = new Player(GAME_CONFIG.canvasWidth, GAME_CONFIG.canvasHeight);
     this.#gameState = new GameState();
-    this.#inputHandler = new InputHandler();
+    this.#inputHandler = new InputHandler(window, canvasElement);
     this.#renderer = new Renderer(canvasElement);
 
-    canvasElement.width = GAME_CONFIG.canvasWidth;
-    canvasElement.height = GAME_CONFIG.canvasHeight;
-
     this.#inputHandler.setCallback((action: InputAction) => this.handleAction(action));
+  }
+
+  togglePause(): void {
+    this.handleAction('togglePause');
+  }
+
+  /**
+   * Unconditional, unlike the `R` key. Pressing R mid-run would wipe it by accident, so that
+   * path stays gated to game over; tapping a labelled button is deliberate.
+   */
+  restart(): void {
+    this.reset();
   }
 
   private handleAction(action: InputAction): void {
@@ -89,6 +98,13 @@ export class Game {
   }
 
   private movePlayer(deltaTime: number): void {
+    const pointerFraction = this.#inputHandler.getPointerFraction();
+
+    if (pointerFraction !== null) {
+      this.#player.moveToward(pointerFraction * GAME_CONFIG.canvasWidth, deltaTime);
+      return;
+    }
+
     if (this.#inputHandler.isMovingLeft()) {
       this.#player.moveLeft(deltaTime);
     }

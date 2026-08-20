@@ -68,3 +68,29 @@ jobs:
           name: dist
           path: dist/
           retention-days: 7
+
+  # Separate job so browser downloads never slow the main gate. Guards the class of bug that
+  # unit tests and a desktop playthrough both missed: the game was unplayable on a phone.
+  mobile:
+    name: Mobile regression check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run mobile checks
+        run: npm run test:mobile

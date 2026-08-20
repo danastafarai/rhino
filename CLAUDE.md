@@ -6,7 +6,8 @@
 
 ### Game Mechanics
 
-- **Player Control**: Move a turtle left and right across the bottom of the screen
+- **Player Control**: Move a turtle left and right across the bottom of the screen — keyboard
+  on desktop, drag anywhere on the board on touch devices
 - **Objective**: Catch falling objects to score points
 - **Lives**: Start with 3; every object that reaches the bottom uncaught costs one
 - **Game Over**: Triggered at zero lives; `R` restarts
@@ -27,10 +28,11 @@ pushing — it is the exact sequence CI runs.
 | `npm run typecheck`     | `tsc --noEmit`                                  |
 | `npm run lint`          | ESLint, fails on any warning                    |
 | `npm run format:check`  | Prettier verification (`npm run format` writes) |
-| `npm test`              | Vitest, single run — 48 tests                   |
+| `npm test`              | Vitest, single run — 61 tests                   |
 | `npm run test:watch`    | Vitest in watch mode                            |
 | `npm run test:coverage` | Vitest with v8 coverage report                  |
 | `npm run build`         | Typecheck, then production bundle into `dist/`  |
+| `npm run test:mobile`   | Emulated Android touch checks (needs Chromium)  |
 | `npm run ci`            | **The full gate — run this before pushing**     |
 
 ---
@@ -97,8 +99,13 @@ and import CSS from TypeScript rather than linking it, so Vite bundles and hashe
     cannot be delta-scaled.
   - **Discrete** actions are _pushed_ via `InputAction` (`'togglePause' | 'restart'`), fired
     once on key release.
-- Takes an `EventTarget` (defaults to `window`) so tests can dispatch real `KeyboardEvent`s.
-- `destroy()` unregisters both listeners; handlers are bound class fields so the removal matches.
+  - **Pointer/touch** is polled too: `getPointerFraction()` returns where the finger is across
+    the play surface as 0–1, or `null` when nothing is pressed. It reports a _fraction_, not a
+    pixel, so `InputHandler` stays free of canvas geometry and the caller maps it into the
+    logical space.
+- Takes an `EventTarget` for keys and an optional `HTMLElement` as the pointer surface, so tests
+  can dispatch real `KeyboardEvent`s and `PointerEvent`s without touching globals.
+- `destroy()` unregisters every listener; handlers are bound class fields so the removal matches.
 - All key handling lives here — never attach game key listeners in `app.ts`
 
 #### Rendering (`src/render/`)
@@ -281,6 +288,33 @@ disabled by a misspelled rule name — all of which one `npm install && npm run 
 4. Render All → Draw player, objects, UI
 5. Check Win/Lose Conditions
 ```
+
+### Mobile & Canvas Sizing (non-negotiable)
+
+**The game thinks in a fixed logical space of `GAME_CONFIG.canvasWidth × canvasHeight`
+(800×600).** Every tuned constant assumes it. `Renderer` scales that space onto whatever the
+element actually occupies, multiplied by `devicePixelRatio`, so drawing code never deals with
+screen size. Never read `canvas.width` to lay out gameplay or UI — that is the _backing store_
+in device pixels, not the logical space. `drawUI` receives the logical dimensions explicitly.
+
+Two traps that already cost a sprint:
+
+1. **Never put the canvas in normal flow inside an aspect-ratio box.** A canvas is a replaced
+   element whose `width`/`height` attributes give it an intrinsic aspect ratio, and the renderer
+   sets those attributes from the element's measured size. In flow that closes a feedback loop —
+   measure → set backing store → intrinsic ratio changes → box changes — and it settles at the
+   wrong shape, stretching the game. `#gameCanvas` is `position: absolute; inset: 0` inside a
+   `position: relative` `#stage` so it cannot influence its parent's height.
+2. **The play surface needs `touch-action: none`.** Without it the browser claims the drag as a
+   scroll and the turtle never moves.
+
+**Every control needs a touch path.** The game shipped keyboard-only once and was completely
+unplayable on a phone while every test passed. Anything reachable only by keypress must also be
+reachable by touch — dragging for movement, on-screen buttons for pause and restart. Instruction
+text is chosen by `@media (hover: none) and (pointer: coarse)`; never tell a phone to press `A`.
+
+`npm run test:mobile` drives emulated Pixel 5 and Galaxy S9+ with real touch events and fails on
+regressions in any of the above. Run it after touching input, layout, or rendering.
 
 ### Frame-Rate Independence (non-negotiable)
 

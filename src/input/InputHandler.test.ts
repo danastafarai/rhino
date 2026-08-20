@@ -4,6 +4,25 @@ import type { InputAction } from './InputHandler';
 
 let target: EventTarget;
 let handler: InputHandler;
+let surface: HTMLElement;
+
+function pointer(type: string, clientX: number): void {
+  const event = new Event(type, { bubbles: true, cancelable: true }) as PointerEvent & {
+    clientX: number;
+    pointerId: number;
+  };
+  Object.defineProperty(event, 'clientX', { value: clientX });
+  Object.defineProperty(event, 'pointerId', { value: 1 });
+  surface.dispatchEvent(event);
+}
+
+function makeSurface(width = 400, left = 0): HTMLElement {
+  const element = document.createElement('div');
+  element.getBoundingClientRect = () =>
+    ({ left, right: left + width, width, top: 0, bottom: 300, height: 300 }) as DOMRect;
+  document.body.appendChild(element);
+  return element;
+}
 
 function press(key: string): void {
   target.dispatchEvent(new KeyboardEvent('keydown', { key, cancelable: true }));
@@ -15,11 +34,13 @@ function release(key: string): void {
 
 beforeEach(() => {
   target = new EventTarget();
-  handler = new InputHandler(target);
+  surface = makeSurface();
+  handler = new InputHandler(target, surface);
 });
 
 afterEach(() => {
   handler.destroy();
+  surface.remove();
 });
 
 describe('InputHandler', () => {
@@ -100,6 +121,77 @@ describe('InputHandler', () => {
     press('a');
     handler.clear();
     expect(handler.isMovingLeft()).toBe(false);
+  });
+
+  it('should report no pointer before any touch', () => {
+    expect(handler.getPointerFraction()).toBeNull();
+  });
+
+  it('should report where the pointer is across the surface', () => {
+    pointer('pointerdown', 200);
+    expect(handler.getPointerFraction()).toBeCloseTo(0.5, 6);
+
+    pointer('pointermove', 400);
+    expect(handler.getPointerFraction()).toBeCloseTo(1, 6);
+
+    pointer('pointermove', 0);
+    expect(handler.getPointerFraction()).toBeCloseTo(0, 6);
+  });
+
+  it('should clamp a pointer dragged outside the surface', () => {
+    pointer('pointerdown', 200);
+    pointer('pointermove', -500);
+    expect(handler.getPointerFraction()).toBe(0);
+
+    pointer('pointermove', 9999);
+    expect(handler.getPointerFraction()).toBe(1);
+  });
+
+  it('should account for a surface that is not flush with the viewport', () => {
+    handler.destroy();
+    surface.remove();
+    surface = makeSurface(400, 100);
+    handler = new InputHandler(target, surface);
+
+    pointer('pointerdown', 300);
+    expect(handler.getPointerFraction()).toBeCloseTo(0.5, 6);
+  });
+
+  it('should ignore pointer movement that never started with a press', () => {
+    pointer('pointermove', 350);
+    expect(handler.getPointerFraction()).toBeNull();
+  });
+
+  it('should release the pointer on pointerup and cancel', () => {
+    pointer('pointerdown', 200);
+    pointer('pointerup', 200);
+    expect(handler.getPointerFraction()).toBeNull();
+
+    pointer('pointerdown', 200);
+    pointer('pointercancel', 200);
+    expect(handler.getPointerFraction()).toBeNull();
+  });
+
+  it('should preventDefault on pointer drags so the page does not scroll', () => {
+    const down = new Event('pointerdown', { bubbles: true, cancelable: true });
+    Object.defineProperty(down, 'clientX', { value: 200 });
+    Object.defineProperty(down, 'pointerId', { value: 1 });
+    surface.dispatchEvent(down);
+    expect(down.defaultPrevented).toBe(true);
+  });
+
+  it('should clear the pointer along with held keys', () => {
+    press('a');
+    pointer('pointerdown', 200);
+    handler.clear();
+    expect(handler.isMovingLeft()).toBe(false);
+    expect(handler.getPointerFraction()).toBeNull();
+  });
+
+  it('should stop tracking pointers after destroy', () => {
+    handler.destroy();
+    pointer('pointerdown', 200);
+    expect(handler.getPointerFraction()).toBeNull();
   });
 
   it('should stop listening after destroy', () => {
