@@ -25,8 +25,8 @@ pushing — it is the exact sequence CI runs.
 | ----------------------- | ----------------------------------------------- |
 | `npm install`           | Install dependencies (required before all else) |
 | `npm run dev`           | Dev server at http://localhost:5173             |
-| `npm run typecheck`     | `tsc --noEmit`                                  |
-| `npm run lint`          | ESLint, fails on any warning                    |
+| `npm run typecheck`     | `tsc --noEmit` over src/ **and** vite.config.ts |
+| `npm run lint`          | ESLint over src/ and scripts/, 0 warnings       |
 | `npm run format:check`  | Prettier verification (`npm run format` writes) |
 | `npm test`              | Vitest, single run — 61 tests                   |
 | `npm run test:watch`    | Vitest in watch mode                            |
@@ -71,10 +71,38 @@ rhino/
 │   ├── constants.ts         # Tunable game configuration
 │   └── app.ts               # Application entry point
 ├── public/                  # Static assets copied verbatim (no source here)
+├── scripts/                 # Node-side checks (check-mobile.mjs)
 ├── docs/scrum/              # Sprint plans, reviews, product backlog
 ├── .github/workflows/ci.yml # CI pipeline
+├── vite.config.ts           # Vite AND Vitest config — single source of truth
+├── tsconfig.json            # App code (src/), DOM libs, vite/client types
+├── tsconfig.node.json       # Node-side files (vite.config.ts)
 └── package.json
 ```
+
+### Config Structure (Vite 5)
+
+Pinned to `vite@^5.4.21`, Vitest 2, TypeScript 5.
+
+**One config file, not two.** `test` lives inside `vite.config.ts` behind
+`/// <reference types="vitest/config" />`. A standalone `vitest.config.ts` would _take
+precedence over_ `vite.config.ts` rather than merge with it, so build and test resolution could
+drift apart silently — an alias added for the build would not exist in tests.
+
+**Two tsconfigs, and `typecheck` runs both.** `tsconfig.json` covers `src/`;
+`tsconfig.node.json` covers `vite.config.ts`. This is not ceremony: with a single
+`include: ["src"]`, the config files were invisible to `tsc`, and a blatant type error in
+`vite.config.ts` passed `npm run typecheck` cleanly.
+
+**Never declare a path alias in only one of the two places.** `tsconfig` `paths` and Vite's
+`resolve.alias` are separate resolvers. A `@/*` path was declared in `tsconfig` but never
+wired into Vite: `tsc` accepted `import ... from '@/game/Game'` and `vite build` then failed
+with "Could not resolve". Typecheck-green-but-build-red is the exact failure mode Sprint 01
+existed to eliminate. The alias has been removed — the codebase uses relative imports. If you
+add one back, add it to **both** files and prove it with a build.
+
+`src/vite-env.d.ts` pulls in `vite/client` types, which is what makes `import.meta.env`,
+`?url`, `?raw`, and CSS imports type-check.
 
 **Entry point rule:** `index.html` belongs at the project root, not in `public/`. Vite resolves
 the build entry from the root and copies `publicDir` verbatim — an HTML file in `public/`
