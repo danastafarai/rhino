@@ -61,8 +61,8 @@ Runs the exact sequence CI runs: typecheck → lint → format check → tests w
 
 **Phone / tablet**
 
-Drag anywhere on the board to steer the turtle, and use the on-screen **Pause** and **Restart**
-buttons.
+Tap and hold the **left half** of the board to move left, the **right half** to move right. The
+pressed side lights up with an arrow while held. Pause and restart are on-screen buttons.
 
 ### Playing on your phone
 
