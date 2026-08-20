@@ -12,6 +12,10 @@ export function drawUI(
   ctx.fillText(`Score: ${gameState.getScore()}`, 20, 40);
   ctx.fillText(`Level: ${gameState.getLevel() + 1}`, 20, 70);
 
+  ctx.textAlign = 'right';
+  ctx.fillText(`Lives: ${gameState.getLives()}`, canvasWidth - 20, 40);
+  ctx.textAlign = 'left';
+
   if (gameState.isPaused()) {
     ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
@@ -36,11 +40,7 @@ export function drawUI(
 
     ctx.font = '24px Arial';
     ctx.fillText(`Final Score: ${gameState.getScore()}`, canvasWidth / 2, canvasHeight / 2 + 20);
-    ctx.fillText(
-      `High Score: ${gameState.getHighScore()}`,
-      canvasWidth / 2,
-      canvasHeight / 2 + 60
-    );
+    ctx.fillText(`High Score: ${gameState.getHighScore()}`, canvasWidth / 2, canvasHeight / 2 + 60);
 
     ctx.font = '18px Arial';
     ctx.fillText('Press R to Restart', canvasWidth / 2, canvasHeight / 2 + 110);

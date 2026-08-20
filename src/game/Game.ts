@@ -24,6 +24,7 @@ export class Game {
   #currentGravity: number = GAME_CONFIG.gravity;
   #lastLevel: number = 0;
   #running: boolean = true;
+  #frameListeners: Array<(state: GameState) => void> = [];
 
   constructor(canvasElement: HTMLCanvasElement) {
     this.#player = new Player(GAME_CONFIG.canvasWidth, GAME_CONFIG.canvasHeight);
@@ -49,13 +50,21 @@ export class Game {
       this.#player.moveLeft();
     } else if (action === 'moveRight') {
       this.#player.moveRight();
-    } else if (action === 'pause') {
+    } else if (action === 'togglePause') {
       if (this.#gameState.isPlaying()) {
         this.#gameState.setStatus('paused');
       } else if (this.#gameState.isPaused()) {
         this.#gameState.setStatus('playing');
       }
+    } else if (action === 'restart') {
+      if (this.#gameState.isGameOver()) {
+        this.reset();
+      }
     }
+  }
+
+  onFrame(listener: (state: GameState) => void): void {
+    this.#frameListeners.push(listener);
   }
 
   start(): void {
@@ -72,6 +81,10 @@ export class Game {
     this.#inputHandler.update();
     this.update(deltaTime);
     this.#renderer.render(this.#player, this.#objects, this.#gameState);
+
+    for (const listener of this.#frameListeners) {
+      listener(this.#gameState);
+    }
 
     requestAnimationFrame(this.gameLoop);
   };
@@ -116,7 +129,17 @@ export class Game {
   }
 
   private removeOffScreenObjects(): void {
-    this.#objects = this.#objects.filter((obj) => !obj.isOffScreen());
+    const remaining: FallingObject[] = [];
+
+    for (const obj of this.#objects) {
+      if (obj.isOffScreen()) {
+        this.#gameState.loseLife();
+      } else {
+        remaining.push(obj);
+      }
+    }
+
+    this.#objects = remaining;
   }
 
   private updateDifficulty(): void {
@@ -129,7 +152,8 @@ export class Game {
 
     this.#spawnRate = Math.min(
       SPAWN_RATE_MAX,
-      GAME_CONFIG.initialSpawnRate + this.#gameState.getElapsedTime() * SPAWN_RATE_INCREASE_PER_SECOND
+      GAME_CONFIG.initialSpawnRate +
+        this.#gameState.getElapsedTime() * SPAWN_RATE_INCREASE_PER_SECOND
     );
   }
 

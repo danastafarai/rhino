@@ -16,3 +16,4 @@ export const SPAWN_RATE_MAX = 0.1;
 export const GRAVITY_INCREASE_PER_LEVEL = 0.5;
 export const POINTS_PER_OBJECT = 10;
 export const LEVEL_UP_SCORE = 100;
+export const INITIAL_LIVES = 3;

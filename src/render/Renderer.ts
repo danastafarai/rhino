@@ -18,11 +18,7 @@ export class Renderer {
     this.#ctx = ctx;
   }
 
-  render(
-    player: Player,
-    objects: FallingObject[],
-    gameState: GameState
-  ): void {
+  render(player: Player, objects: FallingObject[], gameState: GameState): void {
     this.clearCanvas();
     drawPlayer(this.#ctx, player);
     drawObjects(this.#ctx, objects);

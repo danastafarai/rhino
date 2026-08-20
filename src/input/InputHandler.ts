@@ -1,6 +1,6 @@
 export type InputCallback = (action: InputAction) => void;
 
-export type InputAction = 'moveLeft' | 'moveRight' | 'pause' | 'resume';
+export type InputAction = 'moveLeft' | 'moveRight' | 'togglePause' | 'restart';
 
 export class InputHandler {
   #pressedKeys: Set<string> = new Set();
@@ -17,7 +17,7 @@ export class InputHandler {
 
   private handleKeyDown(event: KeyboardEvent): void {
     const key = event.key.toLowerCase();
-    if (['a', 'd', 'arrowleft', 'arrowright', 'p'].includes(key)) {
+    if (['a', 'd', 'arrowleft', 'arrowright', 'p', 'r'].includes(key)) {
       event.preventDefault();
     }
 
@@ -29,7 +29,9 @@ export class InputHandler {
     this.#pressedKeys.delete(key);
 
     if (key === 'p') {
-      this.#callback?.('pause');
+      this.#callback?.('togglePause');
+    } else if (key === 'r') {
+      this.#callback?.('restart');
     }
   }
 

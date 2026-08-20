@@ -69,6 +69,64 @@ describe('GameState', () => {
     expect(gameState.isPlaying()).toBe(true);
   });
 
+  it('should start with three lives and not be game over', () => {
+    const gameState = new GameState();
+    expect(gameState.getLives()).toBe(3);
+    expect(gameState.isGameOver()).toBe(false);
+  });
+
+  it('should end the game when lives run out', () => {
+    const gameState = new GameState();
+
+    gameState.loseLife();
+    expect(gameState.getLives()).toBe(2);
+    expect(gameState.isGameOver()).toBe(false);
+
+    gameState.loseLife();
+    gameState.loseLife();
+    expect(gameState.getLives()).toBe(0);
+    expect(gameState.isGameOver()).toBe(true);
+    expect(gameState.getStatus()).toBe('gameOver');
+  });
+
+  it('should not drop below zero lives once game over', () => {
+    const gameState = new GameState();
+    for (let i = 0; i < 10; i++) {
+      gameState.loseLife();
+    }
+    expect(gameState.getLives()).toBe(0);
+  });
+
+  it('should not lose lives while paused', () => {
+    const gameState = new GameState();
+    gameState.setStatus('paused');
+    gameState.loseLife();
+    expect(gameState.getLives()).toBe(3);
+  });
+
+  it('should restore lives on reset', () => {
+    const gameState = new GameState();
+    gameState.loseLife();
+    gameState.loseLife();
+    gameState.loseLife();
+    expect(gameState.isGameOver()).toBe(true);
+
+    gameState.reset();
+    expect(gameState.getLives()).toBe(3);
+    expect(gameState.isGameOver()).toBe(false);
+    expect(gameState.isPlaying()).toBe(true);
+  });
+
+  it('should keep the high score across a reset', () => {
+    const gameState = new GameState();
+    for (let i = 0; i < 5; i++) {
+      gameState.incrementScore();
+    }
+    gameState.reset();
+    expect(gameState.getScore()).toBe(0);
+    expect(gameState.getHighScore()).toBe(50);
+  });
+
   it('should track elapsed time', () => {
     const gameState = new GameState();
     expect(gameState.getElapsedTime()).toBe(0);

@@ -8,14 +8,11 @@ export class FallingObject {
   #height: number;
   #canvasHeight: number;
 
-  constructor(
-    canvasWidth: number,
-    canvasHeight: number,
-    fallSpeed: number
-  ) {
+  constructor(canvasWidth: number, canvasHeight: number, fallSpeed: number) {
     this.#canvasHeight = canvasHeight;
 
-    const size = Math.random() * (GAME_CONFIG.objectMaxSize - GAME_CONFIG.objectMinSize) +
+    const size =
+      Math.random() * (GAME_CONFIG.objectMaxSize - GAME_CONFIG.objectMinSize) +
       GAME_CONFIG.objectMinSize;
     this.#width = size;
     this.#height = size;

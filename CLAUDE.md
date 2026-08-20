@@ -5,16 +5,40 @@
 **Rhino** is a browser-based game where players control a turtle to catch falling objects. The goal is to continuously improve the webapp through iterative development, maintaining clean architecture and code quality throughout.
 
 ### Game Mechanics
+
 - **Player Control**: Move a turtle left and right across the bottom of the screen
 - **Objective**: Catch falling objects to score points
+- **Lives**: Start with 3; every object that reaches the bottom uncaught costs one
+- **Game Over**: Triggered at zero lives; `R` restarts
 - **Difficulty**: Progressive increase in object falling speed and spawn rate
 - **Score System**: Track player score with visual feedback
+
+---
+
+## Verified Commands
+
+Every command below was executed against this tree and exits 0. Run `npm run ci` before
+pushing — it is the exact sequence CI runs.
+
+| Command                 | Purpose                                         |
+| ----------------------- | ----------------------------------------------- |
+| `npm install`           | Install dependencies (required before all else) |
+| `npm run dev`           | Dev server at http://localhost:5173             |
+| `npm run typecheck`     | `tsc --noEmit`                                  |
+| `npm run lint`          | ESLint, fails on any warning                    |
+| `npm run format:check`  | Prettier verification (`npm run format` writes) |
+| `npm test`              | Vitest, single run — 27 tests                   |
+| `npm run test:watch`    | Vitest in watch mode                            |
+| `npm run test:coverage` | Vitest with v8 coverage report                  |
+| `npm run build`         | Typecheck, then production bundle into `dist/`  |
+| `npm run ci`            | **The full gate — run this before pushing**     |
 
 ---
 
 ## Architecture
 
 ### Core Principles
+
 1. **Separation of Concerns** - Game logic, rendering, and input handling are independent
 2. **Clean Code** - Self-documenting code with minimal comments
 3. **Single Responsibility** - Each module handles one aspect of the game
@@ -24,12 +48,14 @@
 
 ```
 rhino/
+├── index.html               # Vite entry point — MUST stay at root
 ├── src/
 │   ├── game/
 │   │   ├── Game.ts          # Main game loop orchestrator
 │   │   ├── Player.ts        # Turtle entity and movement
 │   │   ├── FallingObject.ts # Collectible objects
-│   │   └── GameState.ts     # Game state management
+│   │   ├── GameState.ts     # Score, lives, level, status
+│   │   └── *.test.ts        # Colocated unit tests
 │   ├── input/
 │   │   └── InputHandler.ts  # Keyboard input processing
 │   ├── render/
@@ -37,26 +63,40 @@ rhino/
 │   │   └── drawers/         # Specific drawable components
 │   ├── physics/
 │   │   └── Collision.ts     # Collision detection
+│   ├── styles/
+│   │   └── main.css         # Imported by app.ts so Vite bundles it
+│   ├── types.ts             # Shared domain types
+│   ├── constants.ts         # Tunable game configuration
 │   └── app.ts               # Application entry point
-├── public/
-│   └── index.html           # Entry HTML
+├── public/                  # Static assets copied verbatim (no source here)
+├── docs/scrum/              # Sprint plans, reviews, product backlog
+├── .github/workflows/ci.yml # CI pipeline
 └── package.json
 ```
+
+**Entry point rule:** `index.html` belongs at the project root, not in `public/`. Vite resolves
+the build entry from the root and copies `publicDir` verbatim — an HTML file in `public/`
+referencing `../src/...` cannot resolve and breaks the build. Reference source as `/src/app.ts`,
+and import CSS from TypeScript rather than linking it, so Vite bundles and hashes it.
 
 ### Module Responsibilities
 
 #### Game Logic (`src/game/`)
+
 - **Game.ts**: Orchestrates the game loop, manages update/render cycle
 - **Player.ts**: Turtle state, position, speed, movement bounds
 - **FallingObject.ts**: Object state, velocity, position updates
 - **GameState.ts**: Score, level, active objects, game status (playing/paused/over)
 
 #### Input (`src/input/`)
-- **InputHandler.ts**: Converts keyboard events to player actions
-- Exposes clean interface: `moveLeft()`, `moveRight()`, `pause()`
-- Handles key debouncing to prevent input buffering
+
+- **InputHandler.ts**: Converts keyboard events into `InputAction` values
+- Actions: `'moveLeft' | 'moveRight' | 'togglePause' | 'restart'`
+- Held keys drive movement each frame; `togglePause` and `restart` fire once on key release
+- All key handling lives here — never attach game key listeners in `app.ts`
 
 #### Rendering (`src/render/`)
+
 - **Renderer.ts**: Main render orchestrator, clear canvas, coordinate management
 - **drawers/**: Modular drawing functions for each entity type
   - `drawPlayer.ts` - Render turtle sprite
@@ -64,6 +104,7 @@ rhino/
   - `drawUI.ts` - HUD, score, level display
 
 #### Physics (`src/physics/`)
+
 - **Collision.ts**: AABB collision detection between player and objects
 - Pure function: `detectCollision(player, objects) -> collectedIndices`
 
@@ -72,30 +113,37 @@ rhino/
 ## Tech Stack
 
 ### Core Technologies
-- **Language**: TypeScript (for type safety)
-- **Build Tool**: Vite (fast dev server, optimized builds)
+
+- **Language**: TypeScript, `strict: true`
+- **Build Tool**: Vite 5 (esbuild minification — no `terser` dependency)
 - **Canvas API**: Native browser canvas for rendering
-- **Testing**: Vitest + Testing Library for game logic
-- **Package Manager**: npm or pnpm
+- **Testing**: Vitest 2 with the `jsdom` environment
+- **Package Manager**: npm (`package-lock.json` is committed and required by CI)
 
 ### Development Dependencies
-- `typescript` - Type checking
-- `vite` - Build and dev server
-- `vitest` - Unit testing
-- `prettier` - Code formatting
-- `eslint` - Code linting
+
+- `typescript` — type checking
+- `vite` — build and dev server
+- `vitest` + `jsdom` + `@vitest/coverage-v8` — unit testing and coverage
+- `prettier` — code formatting
+- `eslint` + `@typescript-eslint/*` — linting
+
+No runtime dependencies. The game ships as plain TypeScript against browser APIs, and it
+should stay that way unless a dependency earns its bundle cost.
 
 ---
 
 ## Code Conventions
 
 ### Naming
+
 - **Classes**: PascalCase (e.g., `FallingObject`, `InputHandler`)
 - **Functions**: camelCase (e.g., `detectCollision`, `updatePlayerPosition`)
 - **Constants**: UPPER_SNAKE_CASE (e.g., `MAX_PLAYER_SPEED`, `GRAVITY`)
 - **Private members**: Prefix with `#` (e.g., `#position`, `#velocity`)
 
 ### Type Safety
+
 - Use strict TypeScript (`strict: true` in tsconfig.json)
 - Export interfaces from modules for public APIs
 - Avoid `any` type - use specific types or generics
@@ -106,6 +154,7 @@ rhino/
   ```
 
 ### Code Style
+
 - **No comments explaining WHAT** - code should be self-explanatory
 - **Comments only for WHY** - non-obvious constraints, workarounds, domain knowledge
 - **Max line length**: 100 characters
@@ -113,12 +162,14 @@ rhino/
 - **Avoid premature abstractions** - duplicate code is better than wrong abstraction
 
 ### File Organization
+
 - One class per file (exceptions: small related types)
 - Exports grouped at end of file
 - Imports sorted: external deps → relative paths
 - No default exports (easier refactoring and testing)
 
 ### Error Handling
+
 - Validate at system boundaries (input, canvas availability)
 - Use domain types to prevent invalid states (e.g., non-negative score)
 - Fail fast with descriptive messages
@@ -158,13 +209,55 @@ When asked to improve or add features:
    - One logical change per commit
    - Reference issue numbers if applicable
 
+### Continuous Integration
+
+`.github/workflows/ci.yml` runs on every branch push and every PR into `main`:
+
+```
+typecheck → lint → format:check → test:coverage → build
+```
+
+- **Node matrix**: 20.x and 22.x, `fail-fast: false` so one version failing still reports the other
+- **`npm ci`**: requires `package-lock.json` to stay committed — never gitignore it
+- **Concurrency**: superseded runs on the same ref are cancelled
+- **Permissions**: `contents: read` only
+- **Artifacts**: coverage report and `dist/` uploaded from the 22.x leg
+
+`npm run ci` reproduces this locally. Run it before pushing — a red pipeline costs a cycle and
+reviewer trust.
+
+**When adding a check to CI, add it as an npm script first** and include it in the `ci` script,
+so local and CI runs never drift apart.
+
+### Sprint Workflow
+
+Work proceeds in Scrum increments recorded under `docs/scrum/`:
+
+1. **Plan** — measure the current state by _running_ the toolchain, never by reading code.
+   Failing gates become backlog items.
+2. **Commit to a sprint backlog** — a small set of items with a single clear sprint goal.
+3. **Build** — one logical change per item, tests alongside.
+4. **Review** — run every gate and record the actual exit codes in the sprint document.
+5. **Retro + backlog** — carry unfinished and newly discovered work into the product backlog.
+
+The current product backlog lives at the bottom of the latest sprint file.
+
+### Evidence Rule
+
+**Never report an item done without the command output that proves it.** A green exit code is
+the evidence; a description of the change is not. This rule exists because Sprint 00 shipped a
+"complete, ready to run" scaffold that could not build, could not test, and had linting silently
+disabled by a misspelled rule name — all of which one `npm install && npm run ci` would have caught.
+
 ### Git Workflow
+
 - Develop on designated feature branches
 - Squash related commits before merging
 - Rebase on main for clean history
 - Write clear commit messages
 
 ### Branch Naming
+
 - `claude/feature-name` for feature work
 - `claude/fix-issue-name` for bug fixes
 - `claude/refactor-component` for refactoring
@@ -174,6 +267,7 @@ When asked to improve or add features:
 ## Game Systems
 
 ### Update Cycle (per frame)
+
 ```
 1. Process Input → Update Player Position
 2. Update Falling Objects → Remove off-screen objects
@@ -183,39 +277,59 @@ When asked to improve or add features:
 ```
 
 ### Collision Detection
+
 - Use Axis-Aligned Bounding Box (AABB) for simplicity and performance
 - Player is represented as rectangle
 - Objects are represented as rectangles
 - Collision occurs when bounding boxes overlap
 
 ### Difficulty Progression
+
 - Track level (increases every N points or seconds)
 - Adjust: object spawn rate, fall speed, object size
 - Keep progression smooth to avoid frustration
 
 ### Score System
-- 1 point per object caught (baseline)
-- Bonus points for chains (consecutive catches)
-- Display current score and high score
-- Persist high score to localStorage
+
+- 10 points per object caught (`POINTS_PER_OBJECT`)
+- Level increases every 100 points (`LEVEL_UP_SCORE`), raising fall speed
+- Current score, lives, and high score render in both the canvas HUD and the DOM scoreboard
+- High score persists to `localStorage` under `rhino-high-score` and survives a reset
+- _Not yet implemented:_ bonus points for consecutive catches (see product backlog)
+
+### Lives & Game Over
+
+- Start at `INITIAL_LIVES` (3); each object that falls off-screen uncaught costs one life
+- Reaching zero sets status to `gameOver`, which freezes updates and shows the end screen
+- `loseLife()` is inert unless status is `playing`, so a paused or finished game cannot bleed lives
+- `R` restarts only from `gameOver`
+
+### Single Game Loop
+
+`Game` owns the only `requestAnimationFrame` loop. UI that needs per-frame data subscribes via
+`game.onFrame(listener)` — do not start a second loop to poll state, and do not update the DOM
+scoreboard from anywhere else.
 
 ---
 
 ## Performance Considerations
 
 ### Optimization Opportunities
+
 - **Object Pooling**: Reuse falling object instances instead of creating/destroying
 - **Render Batching**: Group canvas draws by type
 - **RequestAnimationFrame**: Use for 60 FPS gameplay
 - **Lazy Loading**: Only load assets when needed
 
 ### Metrics to Monitor
+
 - Frame rate (target 60 FPS)
 - Number of active game objects
 - Input latency (player action to visual feedback)
 - Memory usage
 
 ### Canvas Optimization
+
 - Clear only the affected regions if needed
 - Use integer coordinates to avoid anti-aliasing
 - Minimize state changes (strokeStyle, fillStyle)
@@ -225,17 +339,39 @@ When asked to improve or add features:
 
 ## Testing Strategy
 
+Tests are colocated with source as `*.test.ts` and run under Vitest with the `jsdom`
+environment (needed for `localStorage` in `GameState`).
+
+### Current coverage
+
+| Module                 | Lines | Covered by                                         |
+| ---------------------- | ----- | -------------------------------------------------- |
+| `GameState.ts`         | 100%  | Score, level, lives, game over, reset, persistence |
+| `Player.ts`            | 100%  | Movement, both bounds, defensive position copy     |
+| `Collision.ts`         | 100%  | Overlap, adjacency, containment                    |
+| `constants.ts`         | 100%  | —                                                  |
+| `Game.ts`              | 0%    | Needs a loop harness with fake timers              |
+| `InputHandler.ts`      | 0%    | Needs DOM event simulation                         |
+| `Renderer.ts`, drawers | 0%    | Needs a canvas 2D context mock                     |
+
+Pure logic is fully covered. The gaps are all modules bound to browser APIs — closing them is
+the top product-backlog item.
+
 ### Unit Tests
-- Game state transitions
-- Collision detection edge cases
-- Score calculation
-- Player movement bounds
+
+- Game state transitions (playing / paused / gameOver)
+- Lives decrement and the zero-lives boundary
+- Collision detection edge cases (adjacent boxes must **not** collide)
+- Score and level calculation
+- Player movement clamped at both screen bounds
 
 ### Integration Tests
+
 - Complete game loop cycle
 - Input → Movement → Rendering pipeline
 
 ### Manual Testing Checklist
+
 - [ ] Player moves smoothly left/right
 - [ ] Objects spawn and fall at expected rate
 - [ ] Collision detection works at edges
@@ -249,16 +385,19 @@ When asked to improve or add features:
 ## Key Design Decisions
 
 ### Why Canvas Over DOM
+
 - Better performance for frequent updates
 - Simpler coordinate system for game mechanics
 - Lower overhead than DOM manipulation
 
 ### Why TypeScript
+
 - Prevents runtime errors through static typing
 - Improves code maintainability at scale
 - Better IDE support and refactoring
 
 ### Why Modular Architecture
+
 - Easy to test individual components
 - Simple to add features without side effects
 - Clear dependencies make it easy to understand
@@ -267,24 +406,32 @@ When asked to improve or add features:
 
 ## Common Improvement Areas
 
+> The live, prioritized product backlog is at the bottom of the most recent file in
+> `docs/scrum/`. That is the authoritative list; the categories below are inspiration for
+> filling it, not a to-do list themselves.
+
 ### Visual Polish
+
 - Add sprite animations for turtle movement
 - Particle effects for object collection
 - Screen shake on collision
 - Gradient or parallax background
 
 ### Gameplay Enhancements
+
 - Power-ups with special effects
 - Enemy objects to avoid
 - Sound effects and music (muted by default)
 - Different game modes (time attack, survival)
 
 ### Persistence
+
 - Store high scores
 - Track statistics (longest game, total objects caught)
 - Save game state for resume
 
 ### Accessibility
+
 - High contrast mode
 - Keyboard-only controls
 - Audio cues for game events
@@ -295,12 +442,14 @@ When asked to improve or add features:
 ## Debugging Tips
 
 ### Common Issues
+
 - **Objects not spawning**: Check spawn logic and bounds
 - **Collision not detecting**: Verify bounding box calculations
 - **Performance lag**: Check object count, reduce draw calls
 - **Input not working**: Verify input handler is listening and updating player state
 
 ### Debug Helpers
+
 - Render bounding boxes with `debugMode` flag
 - Log game state changes for tracing
 - Monitor FPS with performance tools
@@ -311,13 +460,16 @@ When asked to improve or add features:
 ## Resources & References
 
 ### Canvas API
+
 - [MDN Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API)
 - [Game Loop Patterns](https://gameprogrammingpatterns.com/game-loop.html)
 
 ### TypeScript
+
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
 
 ### Game Development
+
 - [2D Game Physics](https://www.gamedev.net/tutorials/programming/general-programming/collision-detection-using-the-separating-axis-theorem-r3042/)
 
 ---
