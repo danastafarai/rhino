@@ -172,17 +172,34 @@ evidence; a description of the change is not.
 
 Ordered by value. Sprint 02 would pull from the top.
 
-| Priority | Item                                            | Rationale                                                                                                                           |
-| -------- | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| High     | Test `Game`, `InputHandler`, `Renderer`         | The three 0%-coverage modules; needs a fake timer + canvas harness                                                                  |
-| High     | `Renderer.clearCanvas()` does not clear         | Paints `rgba(0,0,0,0.1)` each frame, leaving motion smear. Either clear properly or rename to `drawTrail()` and make it intentional |
-| High     | Difficulty curve is time-based, not skill-based | `updateDifficulty` ramps on elapsed time regardless of player performance                                                           |
-| Medium   | Object pooling                                  | `FallingObject` is allocated per spawn; pooling was called out in CLAUDE.md but never implemented                                   |
-| Medium   | Catch-chain bonus scoring                       | CLAUDE.md specifies bonus points for consecutive catches; only flat scoring exists                                                  |
-| Medium   | `FallingObject` has an unused `velocity.x`      | Either implement horizontal drift or drop the field                                                                                 |
-| Medium   | Turtle is a green rectangle                     | Real sprite + movement animation                                                                                                    |
-| Medium   | Responsive canvas                               | Fixed 800×600; `Renderer.resize()` exists but is never called                                                                       |
-| Low      | Particle effects on catch                       | Visual feedback for a successful catch                                                                                              |
-| Low      | Sound effects, muted by default                 | —                                                                                                                                   |
-| Low      | Accessibility pass                              | High-contrast mode, audio cues, difficulty selection                                                                                |
-| Low      | Dependency vulnerabilities                      | `npm audit` reports 7 in the dev toolchain; needs an ESLint 9 flat-config migration                                                 |
+| Priority | Item                                            | Rationale                                                                                                                                                                                                                           |
+| -------- | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| High     | Test `Game`, `InputHandler`, `Renderer`         | The three 0%-coverage modules; needs a fake timer + canvas harness                                                                                                                                                                  |
+| High     | `Renderer.clearCanvas()` does not clear         | Paints `rgba(0,0,0,0.1)` each frame, leaving motion smear. Either clear properly or rename to `drawTrail()` and make it intentional                                                                                                 |
+| High     | Difficulty curve is time-based, not skill-based | `updateDifficulty` ramps on elapsed time regardless of player performance                                                                                                                                                           |
+| Medium   | Object pooling                                  | `FallingObject` is allocated per spawn; pooling was called out in CLAUDE.md but never implemented                                                                                                                                   |
+| Medium   | Catch-chain bonus scoring                       | CLAUDE.md specifies bonus points for consecutive catches; only flat scoring exists                                                                                                                                                  |
+| Medium   | `FallingObject` has an unused `velocity.x`      | Either implement horizontal drift or drop the field                                                                                                                                                                                 |
+| Medium   | Turtle is a green rectangle                     | Real sprite + movement animation                                                                                                                                                                                                    |
+| Medium   | Responsive canvas                               | Fixed 800×600; `Renderer.resize()` exists but is never called                                                                                                                                                                       |
+| Low      | Particle effects on catch                       | Visual feedback for a successful catch                                                                                                                                                                                              |
+| Low      | Sound effects, muted by default                 | —                                                                                                                                                                                                                                   |
+| Low      | Accessibility pass                              | High-contrast mode, audio cues, difficulty selection                                                                                                                                                                                |
+| Low      | Dependency vulnerabilities                      | `npm audit` reports 7 in the dev toolchain; needs an ESLint 9 flat-config migration                                                                                                                                                 |
+| Low      | Bump CI actions off Node 20                     | Run 1 warned `actions/checkout@v4`, `setup-node@v4`, `upload-artifact@v4` target deprecated Node 20 and are forced onto Node 24. Not failing yet. Verify current major tags before bumping — a wrong tag turns a green pipeline red |
+
+---
+
+## CI Verification (Run 1)
+
+[Run 32416603420](https://github.com/danastafarai/rhino/actions/runs/32416603420) — **success**.
+
+- Both matrix legs (Node 20.x and 22.x) ran every gate and passed.
+- 27/27 tests executed on the runner, matching the local run.
+- CI emitted `index-B6XofG70.js` — the same content hash as the local build, so the pipeline is
+  reproducible.
+- Artifacts published from the 22.x leg: `coverage` (48 KB, 26 files) and `dist` (13 KB, 4 files).
+- The artifact-upload steps show as `skipped` on the 20.x leg. That is the intended
+  `matrix.node-version == '22.x'` condition, not a silent failure.
+- Benign: both legs raced to save the same npm cache key and one logged
+  `Unable to reserve cache`. The lockfile is identical, so either leg's cache is correct.
