@@ -2,7 +2,7 @@
 
 **Kontext:** Selbstlernkurse für Kinder — Lektionen, Aufgaben, Projekte, Fortschrittsanzeigen, optional Hardware-Anleitungen (Raspberry Pi). Ziel des MVP: schnell und kostengünstig validieren, ob Kinder (und zahlende Eltern) das Angebot annehmen. Später: weitere Zielgruppen, Kurse, Automatisierungen, KI-Unterstützung.
 
-**Leitprinzip:** Im MVP wird *Lernen validiert, nicht Software gebaut*. Alles, was nicht direkt die Kernhypothese testet („Kinder arbeiten Kurse selbstständig durch und Eltern zahlen dafür"), wird gekauft, geklickt oder manuell erledigt.
+**Leitprinzip:** Im MVP wird _Lernen validiert, nicht Software gebaut_. Alles, was nicht direkt die Kernhypothese testet („Kinder arbeiten Kurse selbstständig durch und Eltern zahlen dafür"), wird gekauft, geklickt oder manuell erledigt.
 
 ---
 
@@ -10,11 +10,11 @@
 
 ### Drei Optionen im Vergleich
 
-| Ansatz | Time-to-Market | Kosten/Monat | Wann sinnvoll |
-|---|---|---|---|
-| **A: No-Code/Low-Code** | 1–2 Wochen | ~30–100 € | Erste 10–50 zahlende Kunden, reine Validierung |
-| **B: Einfache Eigenentwicklung** | 4–8 Wochen | ~20–50 € | Validierung erfolgreich, Produkt-Differenzierung nötig (Kind-UI, Fortschritt, Interaktivität) |
-| **C: Skalierbare Plattform** | 4–6 Monate | 500 €+ | Erst ab nachgewiesenem Product-Market-Fit, >1.000 aktive Nutzer |
+| Ansatz                           | Time-to-Market | Kosten/Monat | Wann sinnvoll                                                                                 |
+| -------------------------------- | -------------- | ------------ | --------------------------------------------------------------------------------------------- |
+| **A: No-Code/Low-Code**          | 1–2 Wochen     | ~30–100 €    | Erste 10–50 zahlende Kunden, reine Validierung                                                |
+| **B: Einfache Eigenentwicklung** | 4–8 Wochen     | ~20–50 €     | Validierung erfolgreich, Produkt-Differenzierung nötig (Kind-UI, Fortschritt, Interaktivität) |
+| **C: Skalierbare Plattform**     | 4–6 Monate     | 500 €+       | Erst ab nachgewiesenem Product-Market-Fit, >1.000 aktive Nutzer                               |
 
 **Empfehlung: Mit A starten, B vorbereiten, C bewusst verschieben.**
 
@@ -46,19 +46,19 @@ Ein einziges deploybares Artefakt, eine Datenbank, keine Microservices, keine Qu
 
 ## 2. Empfohlener Tech-Stack (Phase B)
 
-| Schicht | Empfehlung | Begründung |
-|---|---|---|
-| Frontend + Backend | **Next.js (React, TypeScript)** als Monolith | Eine Codebasis, riesiges Ökosystem, leicht Entwickler zu finden; SSG für Lektionen = schnell und günstig |
-| UI | Tailwind CSS + shadcn/ui, kindgerechtes Theme | Schnelle, konsistente UI ohne Designer-Engpass |
-| Inhalte | **MDX im Git-Repo** (Lektionen, Aufgaben, Pi-Anleitungen) | Kein CMS-Betrieb, Autoren schreiben Markdown, interaktive Komponenten (Quiz, Checkliste) einbettbar |
-| Datenbank | **PostgreSQL** (Supabase oder Neon, EU-Region) | Relational passt zum Datenmodell; Supabase liefert Auth + Row Level Security mit |
-| Auth | Supabase Auth oder Auth.js — **E-Mail nur beim Elternkonto** | Kind-Profile ohne eigene E-Mail (DSGVO/COPPA-freundlich) |
-| Zahlungen | **Stripe** (Subscriptions + Customer Portal) | Abos, Rechnungen, SEPA, Elternportal — nichts selbst bauen |
-| Video | Cloudflare Stream oder Mux; im MVP notfalls unlisted Vimeo | Kein YouTube einbetten (Tracking/Werbung bei Kindern problematisch) |
-| E-Mail | Resend oder Postmark | Transaktional (Verifizierung, Wochenreport an Eltern) |
-| Hosting | Vercel (schnellster Start) oder Hetzner + Coolify (EU, günstig, volle Kontrolle) | Bei starkem Datenschutzfokus: Hetzner, alles in DE/EU |
-| Analytics | Plausible oder PostHog EU | Cookielos bzw. EU-gehostet — bei Kindern Pflicht, kein Google Analytics |
-| Fehler-Monitoring | Sentry (EU-Region) | Früh einbauen, minimaler Aufwand |
+| Schicht            | Empfehlung                                                                       | Begründung                                                                                               |
+| ------------------ | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Frontend + Backend | **Next.js (React, TypeScript)** als Monolith                                     | Eine Codebasis, riesiges Ökosystem, leicht Entwickler zu finden; SSG für Lektionen = schnell und günstig |
+| UI                 | Tailwind CSS + shadcn/ui, kindgerechtes Theme                                    | Schnelle, konsistente UI ohne Designer-Engpass                                                           |
+| Inhalte            | **MDX im Git-Repo** (Lektionen, Aufgaben, Pi-Anleitungen)                        | Kein CMS-Betrieb, Autoren schreiben Markdown, interaktive Komponenten (Quiz, Checkliste) einbettbar      |
+| Datenbank          | **PostgreSQL** (Supabase oder Neon, EU-Region)                                   | Relational passt zum Datenmodell; Supabase liefert Auth + Row Level Security mit                         |
+| Auth               | Supabase Auth oder Auth.js — **E-Mail nur beim Elternkonto**                     | Kind-Profile ohne eigene E-Mail (DSGVO/COPPA-freundlich)                                                 |
+| Zahlungen          | **Stripe** (Subscriptions + Customer Portal)                                     | Abos, Rechnungen, SEPA, Elternportal — nichts selbst bauen                                               |
+| Video              | Cloudflare Stream oder Mux; im MVP notfalls unlisted Vimeo                       | Kein YouTube einbetten (Tracking/Werbung bei Kindern problematisch)                                      |
+| E-Mail             | Resend oder Postmark                                                             | Transaktional (Verifizierung, Wochenreport an Eltern)                                                    |
+| Hosting            | Vercel (schnellster Start) oder Hetzner + Coolify (EU, günstig, volle Kontrolle) | Bei starkem Datenschutzfokus: Hetzner, alles in DE/EU                                                    |
+| Analytics          | Plausible oder PostHog EU                                                        | Cookielos bzw. EU-gehostet — bei Kindern Pflicht, kein Google Analytics                                  |
+| Fehler-Monitoring  | Sentry (EU-Region)                                                               | Früh einbauen, minimaler Aufwand                                                                         |
 
 **Bewusst NICHT im MVP:** eigene Mobile-App (responsive Web reicht), Microservices, Kubernetes, eigenes CMS, Echtzeit-Features, eigene Videoplattform, KI-Features.
 
@@ -114,12 +114,14 @@ Grundsätze: **Datenminimierung beim Kind** (kein Klarname, keine E-Mail, kein e
 ## 5. Automatisierungspotenziale
 
 **Sofort automatisieren (billig, hoher Hebel):**
+
 - Zugriff nach Kauf freischalten (Stripe-Webhook) — nie manuell Konten schalten.
 - Transaktionale E-Mails: Kaufbestätigung, Passwort-Reset, „Kurs abgeschlossen 🎉".
 - Content-Pipeline: Git-Push → CI (Linkcheck, MDX-Validierung) → Deploy.
 - Wöchentlicher Eltern-Report per E-Mail (ein Cronjob, ein Template) — starker Retention-Hebel.
 
 **Später automatisieren:**
+
 - Onboarding-/Reaktivierungs-Sequenzen (nach 7 Tagen Inaktivität), Churn-Signale aus Fortschrittsdaten.
 - Feedback-Auswertung, Support-Vorsortierung.
 
@@ -169,6 +171,7 @@ Evolution statt Rewrite — der Monolith bleibt Kern, herausgelöst wird nur, wa
 ```
 
 Konkrete Skalierungsschritte, jeweils **erst bei realem Bedarf**:
+
 - **Content:** MDX-in-Git → Headless CMS (Payload/Strapi/Sanity), wenn nicht-technische Autoren und Übersetzungen dazukommen.
 - **Events:** Fortschritts-Events auf einen Event-Bus, sobald mehrere Konsumenten existieren (Gamification, Reports, KI, Analytics).
 - **Mandantenfähigkeit:** `organization_id` (Schulen, Kursanbieter) früh im Datenmodell vorsehen, auch wenn ungenutzt.
@@ -180,6 +183,7 @@ Konkrete Skalierungsschritte, jeweils **erst bei realem Bedarf**:
 ## 8. Build-vs.-Manual-Empfehlung
 
 **Jetzt bauen (differenzierend oder gefährlich, wenn falsch):**
+
 - Kind-Profile unter Elternkonto + Einwilligungs-Flow (Datenschutz-Fundament, kaum nachrüstbar).
 - Lern-Player mit Fortschritt (das ist das Produkt).
 - Stripe-Integration inkl. Webhook-Freischaltung.
@@ -187,9 +191,11 @@ Konkrete Skalierungsschritte, jeweils **erst bei realem Bedarf**:
 - Löschung/Export von Kinderdaten.
 
 **Kaufen / Dienste nutzen (Commodity):**
+
 - Auth, Zahlungen, Video-Hosting, E-Mail-Versand, Analytics, Monitoring, Hosting — alles Managed Services, nichts davon selbst betreiben.
 
 **Manuell lösen (bis es weh tut):**
+
 - Support & Rückerstattungen: persönliche E-Mail — im MVP sogar ein Vorteil (direktes Feedback).
 - Onboarding neuer Kurse/Autoren: von Hand ins Repo, kein Autoren-Portal.
 - Feedback auf Projekt-Einreichungen: der Gründer antwortet persönlich („Concierge-MVP" — begeistert Familien und liefert Erkenntnisse für spätere KI-Automatisierung).

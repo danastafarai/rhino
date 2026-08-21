@@ -16,7 +16,7 @@ two files — an Apache-2.0 `LICENSE` and a Rust-template `.gitignore` — from 
 "Initial commit". There is no application code, no build system, no database, no CI/CD, no
 tests, no deployment, and no README. There are no GitHub issues and no pull requests.
 
-What *does* exist is valuable: an unmerged side branch
+What _does_ exist is valuable: an unmerged side branch
 (`claude/edtech-mvp-architecture-g7xozh`) carries two well-reasoned German-language planning
 documents:
 
@@ -37,7 +37,7 @@ them as the baseline.
 plan.** This report:
 
 - documents the true state of the repository (sections 2–15),
-- reviews the *proposed* architecture instead of a nonexistent implementation (section 4),
+- reviews the _proposed_ architecture instead of a nonexistent implementation (section 4),
 - surfaces the small number of real inconsistencies and risks that exist today — notably the
   Rust `.gitignore` vs. the documented Next.js/TypeScript stack decision, the stranded
   planning docs on an unmerged branch, and the strategic dependency on the Phase A validation
@@ -45,7 +45,7 @@ plan.** This report:
 - and converts the planning documents into a Scrum-ready product backlog, epic breakdown,
   4-sprint roadmap, risk register, and Definition of Done (sections 17–24).
 
-**Headline recommendation:** Sprint 1 should be a *foundation sprint* (roadmap milestone B1):
+**Headline recommendation:** Sprint 1 should be a _foundation sprint_ (roadmap milestone B1):
 ratify the tech stack in an ADR, scaffold the repository (Next.js + TypeScript, CI, linting,
 testing), and implement parent accounts + child profiles + the consent flow — the
 privacy-by-design core that the architecture document correctly identifies as "hard to
@@ -60,19 +60,19 @@ begins feature work.
 
 ### 2.1 Facts
 
-| Property | Value |
-|---|---|
-| Repository | `danastafarai/rhino` (GitHub) |
-| Default branch | `main` |
-| Commits on `main` | 1 (`c994b82`, "Initial commit", 2026-02-23) |
-| Files on `main` | `.gitignore` (Rust template), `LICENSE` (Apache-2.0) |
-| Other branches | `claude/edtech-mvp-architecture-g7xozh` (+2 commits: two docs under `docs/`), `claude/edtech-sprint-zero-audit-bf64ge` (this Sprint 0 branch) |
-| Open issues / PRs | 0 / 0 |
-| Project type | None yet (pre-code) |
-| Monorepo | N/A — no packages exist |
-| Package manager / build system / framework / runtime | None present |
-| Languages | Markdown (docs branch) only |
-| Deployment platform | None configured |
+| Property                                             | Value                                                                                                                                         |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Repository                                           | `danastafarai/rhino` (GitHub)                                                                                                                 |
+| Default branch                                       | `main`                                                                                                                                        |
+| Commits on `main`                                    | 1 (`c994b82`, "Initial commit", 2026-02-23)                                                                                                   |
+| Files on `main`                                      | `.gitignore` (Rust template), `LICENSE` (Apache-2.0)                                                                                          |
+| Other branches                                       | `claude/edtech-mvp-architecture-g7xozh` (+2 commits: two docs under `docs/`), `claude/edtech-sprint-zero-audit-bf64ge` (this Sprint 0 branch) |
+| Open issues / PRs                                    | 0 / 0                                                                                                                                         |
+| Project type                                         | None yet (pre-code)                                                                                                                           |
+| Monorepo                                             | N/A — no packages exist                                                                                                                       |
+| Package manager / build system / framework / runtime | None present                                                                                                                                  |
+| Languages                                            | Markdown (docs branch) only                                                                                                                   |
+| Deployment platform                                  | None configured                                                                                                                               |
 
 ### 2.2 Repository map
 
@@ -96,7 +96,7 @@ rhino/  (branch claude/edtech-mvp-architecture-g7xozh)
   business-friendly. If the platform code is intended to remain proprietary, the license file
   applies only to what is published in this repo; no action needed now, but the product owner
   should confirm the repo's intended visibility before shipping paid content into it
-  (course content in Git *is* the CMS in the proposed architecture).
+  (course content in Git _is_ the CMS in the proposed architecture).
 - The planning documents live on an unmerged branch, invisible to anyone browsing `main`.
   They should be merged (backlog story F-1).
 
@@ -110,19 +110,19 @@ rhino/  (branch claude/edtech-mvp-architecture-g7xozh)
 
 ### 3.2 Proposed stack (from `edtech-mvp-architektur.md`, endorsed by this audit)
 
-| Layer | Choice | Rationale (summarized from the doc, reviewed by this audit) |
-|---|---|---|
-| App framework | **Next.js (React, TypeScript)**, single monolith | One codebase, SSG for lesson content, large hiring pool |
-| UI | Tailwind CSS + shadcn/ui, child-friendly theme | Fast, consistent UI without a designer bottleneck |
-| Content | **MDX in the Git repo** (lessons, tasks, Pi guides) | Git is the CMS: PR review, versioning, interactive components |
-| Database | **PostgreSQL** (Supabase or Neon, EU region) | Relational fit; Supabase adds Auth + Row Level Security |
-| Auth | Supabase Auth or Auth.js — **email on parent account only** | Child profiles without email (GDPR/COPPA-friendly) |
-| Payments | **Stripe** (Checkout, Subscriptions, Customer Portal, webhooks) | Buy, don't build |
-| Video | Cloudflare Stream or Mux (no YouTube embeds for children) | No third-party tracking in the child area |
-| Email | Resend or Postmark | Transactional only in MVP |
-| Hosting | Vercel (fastest) or Hetzner + Coolify (EU, data-protection-first) | Decide in ADR-001 |
-| Analytics | Plausible or PostHog EU (cookieless / EU-hosted) | Mandatory posture for a children's product |
-| Monitoring | Sentry (EU region), no PII | Wire in early |
+| Layer         | Choice                                                            | Rationale (summarized from the doc, reviewed by this audit)   |
+| ------------- | ----------------------------------------------------------------- | ------------------------------------------------------------- |
+| App framework | **Next.js (React, TypeScript)**, single monolith                  | One codebase, SSG for lesson content, large hiring pool       |
+| UI            | Tailwind CSS + shadcn/ui, child-friendly theme                    | Fast, consistent UI without a designer bottleneck             |
+| Content       | **MDX in the Git repo** (lessons, tasks, Pi guides)               | Git is the CMS: PR review, versioning, interactive components |
+| Database      | **PostgreSQL** (Supabase or Neon, EU region)                      | Relational fit; Supabase adds Auth + Row Level Security       |
+| Auth          | Supabase Auth or Auth.js — **email on parent account only**       | Child profiles without email (GDPR/COPPA-friendly)            |
+| Payments      | **Stripe** (Checkout, Subscriptions, Customer Portal, webhooks)   | Buy, don't build                                              |
+| Video         | Cloudflare Stream or Mux (no YouTube embeds for children)         | No third-party tracking in the child area                     |
+| Email         | Resend or Postmark                                                | Transactional only in MVP                                     |
+| Hosting       | Vercel (fastest) or Hetzner + Coolify (EU, data-protection-first) | Decide in ADR-001                                             |
+| Analytics     | Plausible or PostHog EU (cookieless / EU-hosted)                  | Mandatory posture for a children's product                    |
+| Monitoring    | Sentry (EU region), no PII                                        | Wire in early                                                 |
 
 **Explicitly out of scope for the MVP** (per the docs, confirmed by this audit): native mobile
 apps, microservices, Kubernetes, a self-hosted CMS, real-time features, community/forum,
@@ -140,7 +140,7 @@ lens on the virtual team reviewed it; the notable observations:
   RLS; Neon needs Auth.js). Decide together with the auth choice in the same ADR.
 - **Security Engineer:** the "no third-party trackers in the child area" rule should be
   enforced by CI (CSP header test), not by convention (backlog C-4).
-- **Frontend/A11y:** child-friendly UI is *more* demanding than adult UI (reading level,
+- **Frontend/A11y:** child-friendly UI is _more_ demanding than adult UI (reading level,
   target sizes, reduced text). An accessibility baseline belongs in the Definition of Done
   from Sprint 1, not retrofitted (see §21).
 
@@ -170,22 +170,22 @@ architecture from the planning documents against the requested principles.
 ```
 
 One deployable artifact, one database, no queues, no microservices. Content lives in Git as
-MDX. Scaling (Phase C) is planned as *evolutionary extraction* from the monolith (content
+MDX. Scaling (Phase C) is planned as _evolutionary extraction_ from the monolith (content
 service/headless CMS, billing service, notification service, AI tutor service, event bus)
 only when a concrete bottleneck exists.
 
 ### 4.2 Evaluation against principles
 
-| Principle | Assessment |
-|---|---|
-| KISS / YAGNI | **Excellent.** The docs explicitly defer microservices, CMS, mobile, AI, and even automation until pain is demonstrated ("manual until it costs >1 day/week"). |
-| SOLID / separation of concerns | Achievable in a Next.js monolith but **not automatic** — Next.js invites mixing data access into route handlers and components. Recommendation: a thin internal layering convention (route → service → repository) documented in CONTRIBUTING from day one (backlog F-5). |
-| DRY | N/A yet; enforce via shared UI components and a single data-access layer. |
-| Clean/Hexagonal Architecture | Full hexagonal architecture would be over-engineering at this size. A pragmatic "modular monolith" with feature folders and one dependency direction is the right calibration. |
-| Domain-Driven Design | The docs implicitly define clean bounded contexts: **Identity & Consent**, **Catalog/Content**, **Learning Progress**, **Billing**. Keep these as top-level modules; they are exactly the Phase C extraction seams. |
-| Feature-based / Vertical slices | Recommended folder organization for the app code (e.g. `features/profiles`, `features/player`, `features/billing`). |
-| Modular monolith readiness | **High** — the plan is a modular monolith by design. |
-| Microservice readiness | Deliberately deferred; the `organization_id` field and event naming (`lesson.completed`) are sensible forward-compatibility hooks that cost nothing now. |
+| Principle                       | Assessment                                                                                                                                                                                                                                                                |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| KISS / YAGNI                    | **Excellent.** The docs explicitly defer microservices, CMS, mobile, AI, and even automation until pain is demonstrated ("manual until it costs >1 day/week").                                                                                                            |
+| SOLID / separation of concerns  | Achievable in a Next.js monolith but **not automatic** — Next.js invites mixing data access into route handlers and components. Recommendation: a thin internal layering convention (route → service → repository) documented in CONTRIBUTING from day one (backlog F-5). |
+| DRY                             | N/A yet; enforce via shared UI components and a single data-access layer.                                                                                                                                                                                                 |
+| Clean/Hexagonal Architecture    | Full hexagonal architecture would be over-engineering at this size. A pragmatic "modular monolith" with feature folders and one dependency direction is the right calibration.                                                                                            |
+| Domain-Driven Design            | The docs implicitly define clean bounded contexts: **Identity & Consent**, **Catalog/Content**, **Learning Progress**, **Billing**. Keep these as top-level modules; they are exactly the Phase C extraction seams.                                                       |
+| Feature-based / Vertical slices | Recommended folder organization for the app code (e.g. `features/profiles`, `features/player`, `features/billing`).                                                                                                                                                       |
+| Modular monolith readiness      | **High** — the plan is a modular monolith by design.                                                                                                                                                                                                                      |
+| Microservice readiness          | Deliberately deferred; the `organization_id` field and event naming (`lesson.completed`) are sensible forward-compatibility hooks that cost nothing now.                                                                                                                  |
 
 ### 4.3 Architecture risks worth naming now (recommendations only, per Sprint 0 rules)
 
@@ -269,7 +269,7 @@ ChildProfile n──n Badge (via ChildBadge, Phase B+)
 ```
 
 **Audit of the proposed model (Database Architect):** the model is sound — data-minimized
-child records (nickname, avatar, birth *year* only), contracts/payments on the parent,
+child records (nickname, avatar, birth _year_ only), contracts/payments on the parent,
 content referenced by path rather than stored. Gaps to close when the schema is first
 implemented (these become acceptance criteria in backlog stories, not changes made now):
 
@@ -298,7 +298,7 @@ implemented (these become acceptance criteria in backlog stories, not changes ma
 **Current state: nothing exists.** No Docker, docker-compose, Kubernetes, Terraform, GitHub
 Actions, or platform configuration of any kind. There is no deployment flow.
 
-**Planned:** Vercel *or* Hetzner+Coolify; Supabase/Neon Postgres (EU); Cloudflare R2/Stream;
+**Planned:** Vercel _or_ Hetzner+Coolify; Supabase/Neon Postgres (EU); Cloudflare R2/Stream;
 CI with preview deployments (roadmap milestone B1).
 
 **Recommendations:**
@@ -329,11 +329,11 @@ authentication, authorization, or input handling to assess.
 
 **Repository-level findings (actionable today):**
 
-| # | Severity | Finding | Recommendation |
-|---|---|---|---|
-| S-1 | Medium | Branch protection status for `main` unknown/likely absent; no CODEOWNERS, no required reviews | Enable branch protection + required CI once CI exists (Sprint 1) |
-| S-2 | Low | No `SECURITY.md`, no dependabot/renovate config | Add with the scaffold (F-4) |
-| S-3 | Info | Apache-2.0 public repo will eventually contain paid course content (MDX-as-CMS) | Product owner to confirm repo visibility/licensing strategy before content lands (F-1 follow-up) |
+| #   | Severity | Finding                                                                                       | Recommendation                                                                                   |
+| --- | -------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| S-1 | Medium   | Branch protection status for `main` unknown/likely absent; no CODEOWNERS, no required reviews | Enable branch protection + required CI once CI exists (Sprint 1)                                 |
+| S-2 | Low      | No `SECURITY.md`, no dependabot/renovate config                                               | Add with the scaffold (F-4)                                                                      |
+| S-3 | Info     | Apache-2.0 public repo will eventually contain paid course content (MDX-as-CMS)               | Product owner to confirm repo visibility/licensing strategy before content lands (F-1 follow-up) |
 
 **Forward-looking assessment of the planned security posture:** the architecture document's
 child-data section is unusually strong for a pre-code project — parent-only accounts, data
@@ -369,14 +369,14 @@ No fixes were applied in Sprint 0 (none are applicable to an empty repository).
   read/write, and Stripe. For the MVP's scale (tens to hundreds of families) there is no
   plausible bottleneck.
 - **Watchpoints to bake into acceptance criteria (not build now):**
-  - *N+1 risk:* the parent dashboard (progress for n children × m courses) is the first
+  - _N+1 risk:_ the parent dashboard (progress for n children × m courses) is the first
     query that tempts an N+1; write it as one aggregate query.
-  - *Video:* never self-host; Cloudflare Stream/Mux with adaptive bitrate (already planned).
-  - *Images in lessons:* use Next.js image optimization from the first lesson.
-  - *Bundle discipline:* interactive MDX widgets should be client components loaded per
+  - _Video:_ never self-host; Cloudflare Stream/Mux with adaptive bitrate (already planned).
+  - _Images in lessons:_ use Next.js image optimization from the first lesson.
+  - _Bundle discipline:_ interactive MDX widgets should be client components loaded per
     lesson, not a global bundle; set a soft budget (e.g. <200 KB JS on lesson pages) in the
     DoD.
-  - *Progress writes:* idempotent single-row upserts; no fan-out.
+  - _Progress writes:_ idempotent single-row upserts; no fan-out.
 
 Performance budgets belong in the Definition of Done (§21) rather than in tooling today.
 
@@ -389,21 +389,21 @@ dependency findings are possible.
 
 **Standards recommended for Sprint 1 onward (Engineering Standards deliverable):**
 
-| Area | Standard |
-|---|---|
-| Formatting | Prettier, default config, enforced in CI (no debates) |
-| Linting | ESLint (next/core-web-vitals) + typescript-eslint strict + jsx-a11y |
-| Types | TypeScript `strict: true` from the first commit; no `any` without a comment |
-| Testing | Vitest (unit), Playwright (E2E); testing pyramid per §21 |
-| Commits | Conventional Commits (`feat:`, `fix:`, `docs:`…) — enables changelogs later |
-| Pull requests | Small PRs to `main` via required review + green CI; PR template with a "child-data impact" checkbox |
-| Documentation | README + CONTRIBUTING + ADRs in `docs/adr/` (MADR format); every architectural decision gets an ADR |
+| Area           | Standard                                                                                                 |
+| -------------- | -------------------------------------------------------------------------------------------------------- |
+| Formatting     | Prettier, default config, enforced in CI (no debates)                                                    |
+| Linting        | ESLint (next/core-web-vitals) + typescript-eslint strict + jsx-a11y                                      |
+| Types          | TypeScript `strict: true` from the first commit; no `any` without a comment                              |
+| Testing        | Vitest (unit), Playwright (E2E); testing pyramid per §21                                                 |
+| Commits        | Conventional Commits (`feat:`, `fix:`, `docs:`…) — enables changelogs later                              |
+| Pull requests  | Small PRs to `main` via required review + green CI; PR template with a "child-data impact" checkbox      |
+| Documentation  | README + CONTRIBUTING + ADRs in `docs/adr/` (MADR format); every architectural decision gets an ADR      |
 | Error handling | Typed error results at service boundaries; user-facing errors are child-appropriate; Sentry for the rest |
-| Logging | Structured logs, **no PII ever** (child data makes this non-negotiable); log levels via env |
-| Env & config | Single `env.ts` with zod validation at boot; `.env.example` maintained; fail fast on missing config |
-| Feature flags | Plain env-var flags in MVP; no flag service (YAGNI) |
-| Secrets | Platform secret manager only; secret scanning enabled on the repo |
-| Dependencies | Renovate/Dependabot weekly; prefer few, boring dependencies; lockfile committed |
+| Logging        | Structured logs, **no PII ever** (child data makes this non-negotiable); log levels via env              |
+| Env & config   | Single `env.ts` with zod validation at boot; `.env.example` maintained; fail fast on missing config      |
+| Feature flags  | Plain env-var flags in MVP; no flag service (YAGNI)                                                      |
+| Secrets        | Platform secret manager only; secret scanning enabled on the repo                                        |
+| Dependencies   | Renovate/Dependabot weekly; prefer few, boring dependencies; lockfile committed                          |
 
 ---
 
@@ -411,22 +411,22 @@ dependency findings are possible.
 
 Audited against the requested feature checklist:
 
-| Feature | Status |
-|---|---|
-| Authentication | ❌ Not implemented (planned: parent-only accounts) |
-| Courses / Lessons | ❌ Not implemented (planned: MDX pipeline + learn player) |
-| Users / Profiles | ❌ Not implemented (planned: parent account + child profiles) |
-| Admin panel | ❌ Not implemented (planned: minimal — user search, manual enrollment, progress reset) |
-| CMS | ❌ Not implemented (planned: Git/MDX **is** the CMS) |
-| Progress tracking | ❌ Not implemented (planned: LessonProgress + progress bars) |
-| Assignments / submissions | ❌ Not implemented (planned: task widgets + TaskSubmission) |
-| Payments | ❌ Not implemented (planned: Stripe Checkout + webhooks + Customer Portal) |
-| Notifications / Email | ❌ Not implemented (planned: transactional via Resend/Postmark; weekly parent report) |
-| Analytics / Dashboards | ❌ Not implemented (planned: Plausible/PostHog EU; SQL-based internal reporting) |
-| Parent accounts | ❌ Not implemented (planned — core concept) |
-| Gamification / Achievements | ❌ Not implemented (planned: light badges; **leaderboards deliberately excluded**) |
-| Leaderboards | 🚫 Deliberately out of scope (comparison pressure + privacy) |
-| Hardware integration | ❌ Not implemented (planned: Pi guides as content — checklists + parts lists, **no device connectivity** in MVP) |
+| Feature                     | Status                                                                                                           |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Authentication              | ❌ Not implemented (planned: parent-only accounts)                                                               |
+| Courses / Lessons           | ❌ Not implemented (planned: MDX pipeline + learn player)                                                        |
+| Users / Profiles            | ❌ Not implemented (planned: parent account + child profiles)                                                    |
+| Admin panel                 | ❌ Not implemented (planned: minimal — user search, manual enrollment, progress reset)                           |
+| CMS                         | ❌ Not implemented (planned: Git/MDX **is** the CMS)                                                             |
+| Progress tracking           | ❌ Not implemented (planned: LessonProgress + progress bars)                                                     |
+| Assignments / submissions   | ❌ Not implemented (planned: task widgets + TaskSubmission)                                                      |
+| Payments                    | ❌ Not implemented (planned: Stripe Checkout + webhooks + Customer Portal)                                       |
+| Notifications / Email       | ❌ Not implemented (planned: transactional via Resend/Postmark; weekly parent report)                            |
+| Analytics / Dashboards      | ❌ Not implemented (planned: Plausible/PostHog EU; SQL-based internal reporting)                                 |
+| Parent accounts             | ❌ Not implemented (planned — core concept)                                                                      |
+| Gamification / Achievements | ❌ Not implemented (planned: light badges; **leaderboards deliberately excluded**)                               |
+| Leaderboards                | 🚫 Deliberately out of scope (comparison pressure + privacy)                                                     |
+| Hardware integration        | ❌ Not implemented (planned: Pi guides as content — checklists + parts lists, **no device connectivity** in MVP) |
 
 **The only existing product assets are the two planning documents.** They are current
 (July 2026), mutually consistent, and consistent with the stated product vision.
@@ -452,7 +452,7 @@ Everything is missing; what matters is the cut. Based on the planning docs and t
 - **Won't Have (this MVP):** mobile apps; community/forum/galleries; leaderboards; AI
   tutor; self-serve authoring portal; school/company tenancy; real device connectivity to
   the Raspberry Pi; additional learning paths (Python, JS, Rust, PLC/FUP/KOP, robotics,
-  electronics, AI, Linux, networking — future paths only need to be *representable* in the
+  electronics, AI, Linux, networking — future paths only need to be _representable_ in the
   course data model, which they are: a course is a course).
 
 ---
@@ -461,14 +461,14 @@ Everything is missing; what matters is the cut. Based on the planning docs and t
 
 For an empty repository the debt list is short, real, and cheap — all are quick wins:
 
-| # | Item | Type | Effort | Priority |
-|---|---|---|---|---|
-| D-1 | Planning docs stranded on unmerged branch `claude/edtech-mvp-architecture-g7xozh` — invisible on `main`, at risk of divergence | Process | XS | High |
-| D-2 | `.gitignore` is a Rust template contradicting the documented Next.js/TS stack — misleads every future contributor about the project's nature | Config | XS | High |
-| D-3 | No README — repository communicates nothing about what `rhino` is | Docs | S | High |
-| D-4 | Planning docs are German-only; if any collaborator/contractor is non-German-speaking, the architecture is opaque to them | Docs | S | Medium (defer until a non-German reader exists) |
-| D-5 | No ADR structure — the stack recommendation lives in prose and was never formally accepted; the Rust-vs-TS ambiguity (D-2) is a symptom | Process | S | High |
-| D-6 | No branch protection / required checks on `main` | Process | XS | Medium (meaningful once CI exists) |
+| #   | Item                                                                                                                                         | Type    | Effort | Priority                                        |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------ | ----------------------------------------------- |
+| D-1 | Planning docs stranded on unmerged branch `claude/edtech-mvp-architecture-g7xozh` — invisible on `main`, at risk of divergence               | Process | XS     | High                                            |
+| D-2 | `.gitignore` is a Rust template contradicting the documented Next.js/TS stack — misleads every future contributor about the project's nature | Config  | XS     | High                                            |
+| D-3 | No README — repository communicates nothing about what `rhino` is                                                                            | Docs    | S      | High                                            |
+| D-4 | Planning docs are German-only; if any collaborator/contractor is non-German-speaking, the architecture is opaque to them                     | Docs    | S      | Medium (defer until a non-German reader exists) |
+| D-5 | No ADR structure — the stack recommendation lives in prose and was never formally accepted; the Rust-vs-TS ambiguity (D-2) is a symptom      | Process | S      | High                                            |
+| D-6 | No branch protection / required checks on `main`                                                                                             | Process | XS     | Medium (meaningful once CI exists)              |
 
 There is no legacy code, fragile code, dead code, duplication, or deprecated dependency —
 the codebase's greatest current asset is that it has no debt to carry into Sprint 1.
@@ -479,11 +479,11 @@ the codebase's greatest current asset is that it has no debt to carry into Sprin
 
 **Existing documentation:**
 
-| Document | Location | Assessment |
-|---|---|---|
+| Document                    | Location    | Assessment                                                                                                                        |
+| --------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | `edtech-mvp-architektur.md` | side branch | High quality: options analysis, stack rationale, data model, privacy/GDPR Art. 8 strategy, scaling sketch, build/buy/manual rules |
-| `roadmap-phase-a-b.md` | side branch | High quality: milestone plan with explicit, testable gates |
-| `LICENSE` | `main` | Apache-2.0, fine |
+| `roadmap-phase-a-b.md`      | side branch | High quality: milestone plan with explicit, testable gates                                                                        |
+| `LICENSE`                   | `main`      | Apache-2.0, fine                                                                                                                  |
 
 **Missing documentation (in priority order):**
 
@@ -530,42 +530,42 @@ Ordered, smallest first; items 1–3 are Sprint 0/1 housekeeping, the rest fold 
 Story-point scale: Fibonacci (1, 2, 3, 5, 8, 13). Priorities: P0 (blocking) → P3.
 The backlog is organized under six epics (detailed in §18):
 
-| ID | Story | Epic | Priority | Points | Depends on |
-|---|---|---|---|---|---|
-| F-1 | Merge planning docs to `main`; confirm repo visibility/licensing intent | Foundation | P0 | 1 | — |
-| F-2 | Kernel decisions: confirm Phase A gate status with product owner | Foundation | P0 | 1 | — |
-| F-3 | ADR-001: ratify stack, hosting, DB provider, auth provider | Foundation | P0 | 2 | F-2 |
-| F-4 | Scaffold app: Next.js+TS strict, lint/format, Vitest, Playwright, GitHub Actions CI, `.env.example`, correct `.gitignore`, branch protection | Foundation | P0 | 5 | F-3 |
-| F-5 | CONTRIBUTING: layering convention (route→service→repo), feature folders, standards | Foundation | P1 | 2 | F-4 |
-| F-6 | Provision Postgres (EU) + migration tooling + core schema v1 with constraints/indexes per §7 | Foundation | P0 | 5 | F-3 |
-| F-7 | Deploy pipeline: production + preview deployments; Sentry EU wired; backup restore rehearsed | Foundation | P0 | 5 | F-4 |
-| A-1 | Parent registration, login, logout, password reset, email verification | Accounts | P0 | 8 | F-6 |
-| A-2 | Consent flow: terms + child-data consent with stored timestamps | Accounts | P0 | 3 | A-1 |
-| A-3 | Child profiles: create/edit (nickname, avatar from set, birth year), max n per account | Accounts | P0 | 5 | A-1 |
-| A-4 | Streaming-style profile switcher; active-profile session context | Accounts | P0 | 3 | A-3 |
-| A-5 | Rate limiting on auth endpoints; argon2/bcrypt hashing (if Auth.js path) | Accounts | P1 | 2 | A-1 |
-| L-1 | MDX content pipeline: course/lesson structure, frontmatter schema, build-time generation | Learning | P0 | 8 | F-4 |
-| L-2 | Learn player: lesson view, next-navigation, resume at last position | Learning | P0 | 8 | L-1, A-4 |
-| L-3 | Video embedding via Cloudflare Stream/Mux (no third-party trackers) | Learning | P1 | 3 | L-1 |
-| L-4 | Task widgets v1: multiple choice with instant feedback; "done" checklist | Learning | P0 | 5 | L-2 |
-| L-5 | Progress tracking: idempotent lesson completion, per-course progress bar | Learning | P0 | 5 | L-2 |
-| L-6 | Pilot course fully migrated to MDX incl. Pi guide (checklists, parts list) | Learning | P0 | 8 | L-1, L-4 |
-| L-7 | Project photo upload — visible only in parent dashboard, never public | Learning | P2 | 5 | L-4, P-1 |
-| B-1 | Stripe Checkout (subscription and/or one-time) + Customer Portal link | Billing | P0 | 5 | A-1 |
-| B-2 | Stripe webhooks → enrollment on purchase, revoke on cancel/failure (idempotent, signature-verified) | Billing | P0 | 5 | B-1, F-6 |
-| B-3 | Transactional email: purchase confirmation, password reset, course-completed | Billing | P1 | 3 | B-1 |
-| B-4 | Data export (JSON/CSV) + account/profile deletion with cascade, parent-triggered | Billing | P0 | 5 | A-3 |
-| P-1 | Parent dashboard: per-child progress, subscription management, consents view | Parent | P0 | 5 | L-5, B-1 |
-| P-2 | Weekly parent progress report email (cron + template) | Parent | P2 | 3 | P-1 |
-| P-3 | Minimal admin: user search, manual enrollment toggle, progress reset | Parent | P1 | 5 | A-1, L-5 |
-| C-1 | Structural authorization: RLS or account-scoped repository layer + cross-account access tests | Compliance | P0 | 5 | F-6 |
-| C-2 | Content validation in CI: MDX schema, link check | Compliance | P1 | 3 | L-1 |
-| C-3 | EU analytics (Plausible/PostHog EU), cookieless; no trackers in child area | Compliance | P1 | 2 | F-7 |
-| C-4 | CSP enforcing the child-area tracker ban, asserted by a CI test | Compliance | P1 | 3 | F-7 |
-| C-5 | GDPR paperwork: records of processing, DPAs collected, privacy policy pages | Compliance | P1 | 3 | B-4 |
-| G-1 | Simple badges ("first lesson", "course completed") | Growth | P2 | 3 | L-5 |
-| G-2 | Second course published via pipeline with zero code changes | Growth | P2 | 5 | L-6 |
-| G-3 | Metrics-light: 5–6 SQL queries for activation, completion, churn | Growth | P2 | 2 | L-5, B-2 |
+| ID  | Story                                                                                                                                        | Epic       | Priority | Points | Depends on |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | -------- | ------ | ---------- |
+| F-1 | Merge planning docs to `main`; confirm repo visibility/licensing intent                                                                      | Foundation | P0       | 1      | —          |
+| F-2 | Kernel decisions: confirm Phase A gate status with product owner                                                                             | Foundation | P0       | 1      | —          |
+| F-3 | ADR-001: ratify stack, hosting, DB provider, auth provider                                                                                   | Foundation | P0       | 2      | F-2        |
+| F-4 | Scaffold app: Next.js+TS strict, lint/format, Vitest, Playwright, GitHub Actions CI, `.env.example`, correct `.gitignore`, branch protection | Foundation | P0       | 5      | F-3        |
+| F-5 | CONTRIBUTING: layering convention (route→service→repo), feature folders, standards                                                           | Foundation | P1       | 2      | F-4        |
+| F-6 | Provision Postgres (EU) + migration tooling + core schema v1 with constraints/indexes per §7                                                 | Foundation | P0       | 5      | F-3        |
+| F-7 | Deploy pipeline: production + preview deployments; Sentry EU wired; backup restore rehearsed                                                 | Foundation | P0       | 5      | F-4        |
+| A-1 | Parent registration, login, logout, password reset, email verification                                                                       | Accounts   | P0       | 8      | F-6        |
+| A-2 | Consent flow: terms + child-data consent with stored timestamps                                                                              | Accounts   | P0       | 3      | A-1        |
+| A-3 | Child profiles: create/edit (nickname, avatar from set, birth year), max n per account                                                       | Accounts   | P0       | 5      | A-1        |
+| A-4 | Streaming-style profile switcher; active-profile session context                                                                             | Accounts   | P0       | 3      | A-3        |
+| A-5 | Rate limiting on auth endpoints; argon2/bcrypt hashing (if Auth.js path)                                                                     | Accounts   | P1       | 2      | A-1        |
+| L-1 | MDX content pipeline: course/lesson structure, frontmatter schema, build-time generation                                                     | Learning   | P0       | 8      | F-4        |
+| L-2 | Learn player: lesson view, next-navigation, resume at last position                                                                          | Learning   | P0       | 8      | L-1, A-4   |
+| L-3 | Video embedding via Cloudflare Stream/Mux (no third-party trackers)                                                                          | Learning   | P1       | 3      | L-1        |
+| L-4 | Task widgets v1: multiple choice with instant feedback; "done" checklist                                                                     | Learning   | P0       | 5      | L-2        |
+| L-5 | Progress tracking: idempotent lesson completion, per-course progress bar                                                                     | Learning   | P0       | 5      | L-2        |
+| L-6 | Pilot course fully migrated to MDX incl. Pi guide (checklists, parts list)                                                                   | Learning   | P0       | 8      | L-1, L-4   |
+| L-7 | Project photo upload — visible only in parent dashboard, never public                                                                        | Learning   | P2       | 5      | L-4, P-1   |
+| B-1 | Stripe Checkout (subscription and/or one-time) + Customer Portal link                                                                        | Billing    | P0       | 5      | A-1        |
+| B-2 | Stripe webhooks → enrollment on purchase, revoke on cancel/failure (idempotent, signature-verified)                                          | Billing    | P0       | 5      | B-1, F-6   |
+| B-3 | Transactional email: purchase confirmation, password reset, course-completed                                                                 | Billing    | P1       | 3      | B-1        |
+| B-4 | Data export (JSON/CSV) + account/profile deletion with cascade, parent-triggered                                                             | Billing    | P0       | 5      | A-3        |
+| P-1 | Parent dashboard: per-child progress, subscription management, consents view                                                                 | Parent     | P0       | 5      | L-5, B-1   |
+| P-2 | Weekly parent progress report email (cron + template)                                                                                        | Parent     | P2       | 3      | P-1        |
+| P-3 | Minimal admin: user search, manual enrollment toggle, progress reset                                                                         | Parent     | P1       | 5      | A-1, L-5   |
+| C-1 | Structural authorization: RLS or account-scoped repository layer + cross-account access tests                                                | Compliance | P0       | 5      | F-6        |
+| C-2 | Content validation in CI: MDX schema, link check                                                                                             | Compliance | P1       | 3      | L-1        |
+| C-3 | EU analytics (Plausible/PostHog EU), cookieless; no trackers in child area                                                                   | Compliance | P1       | 2      | F-7        |
+| C-4 | CSP enforcing the child-area tracker ban, asserted by a CI test                                                                              | Compliance | P1       | 3      | F-7        |
+| C-5 | GDPR paperwork: records of processing, DPAs collected, privacy policy pages                                                                  | Compliance | P1       | 3      | B-4        |
+| G-1 | Simple badges ("first lesson", "course completed")                                                                                           | Growth     | P2       | 3      | L-5        |
+| G-2 | Second course published via pipeline with zero code changes                                                                                  | Growth     | P2       | 5      | L-6        |
+| G-3 | Metrics-light: 5–6 SQL queries for activation, completion, churn                                                                             | Growth     | P2       | 2      | L-5, B-2   |
 
 Total: ~135 points. At an assumed 20–25 points per two-week sprint for a 1–2 person team,
 this is ~5–6 sprints of work, consistent with the roadmap's 14-week Phase B estimate.
@@ -575,43 +575,43 @@ this is ~5–6 sprints of work, consistent with the roadmap's 14-week Phase B es
 ## 18. Epic Breakdown
 
 **Epic F — Foundation & Infrastructure** (23 pts)
-*Goal:* a deployable, CI-guarded, correctly configured skeleton with a migrated schema.
-*Why first:* everything depends on it; roadmap milestone B1's infrastructure half.
+_Goal:_ a deployable, CI-guarded, correctly configured skeleton with a migrated schema.
+_Why first:_ everything depends on it; roadmap milestone B1's infrastructure half.
 Acceptance (epic level): CI green on every PR; preview deployments work; schema v1 migrated
 with constraints from §7; a backup restore has been performed once; ADR-001 merged.
 
 **Epic A — Accounts, Profiles & Consent** (21 pts)
-*Goal:* parents register and consent; children get data-minimized profiles with a
+_Goal:_ parents register and consent; children get data-minimized profiles with a
 streaming-style switcher.
-*Why early:* the privacy-by-design core that is "hard to retrofit"; roadmap Gate B1 is
+_Why early:_ the privacy-by-design core that is "hard to retrofit"; roadmap Gate B1 is
 literally "a parent registers, creates two child profiles, and switches between them, in
 production".
 Acceptance: Gate B1 wording passes in production; consent timestamps stored; no child
 email/full-name/birth-date fields exist anywhere in the schema.
 
 **Epic L — Learning Experience (Content Pipeline + Player + Progress)** (42 pts)
-*Goal:* a child can work through the full pilot course with progress that survives
+_Goal:_ a child can work through the full pilot course with progress that survives
 logout/login and device switches.
 Acceptance: roadmap Gate B2 wording passes with a real test child; lesson pages are SSG;
 progress upserts idempotent.
 
 **Epic B — Billing & Data Rights** (18 pts)
-*Goal:* purchase-to-cancellation lifecycle fully automated; parents can export and delete.
+_Goal:_ purchase-to-cancellation lifecycle fully automated; parents can export and delete.
 Acceptance: roadmap Gate B3 — full Stripe test-mode cycle without errors; deleting a test
 account demonstrably removes all associated data.
 
 **Epic P — Parent Dashboard & Admin** (13 pts)
-*Goal:* parents see progress and manage the relationship; founder has a minimal admin.
+_Goal:_ parents see progress and manage the relationship; founder has a minimal admin.
 Acceptance: parent dashboard shows all children's progress in one aggregate query (no N+1);
 admin can enroll/reset manually.
 
 **Epic C — Compliance & Child Safety** (16 pts)
-*Goal:* the privacy promises are enforced by structure and CI, not by convention.
+_Goal:_ the privacy promises are enforced by structure and CI, not by convention.
 Acceptance: cross-account access tests in CI; CSP test proves no third-party requests from
 child pages; GDPR paperwork exists before customer migration.
 
 **Epic G — Growth & Retention Basics** (10 pts)
-*Goal:* light gamification, second course, weekly parent report, basic metrics.
+_Goal:_ light gamification, second course, weekly parent report, basic metrics.
 Acceptance: roadmap Gate B→C measurables are queryable.
 
 ---
@@ -621,14 +621,14 @@ Acceptance: roadmap Gate B→C measurables are queryable.
 Two-week sprints; capacity assumption 20–25 pts (1–2 engineers). Maps to roadmap milestones
 B1–B5. **Precondition: F-2 (Phase A gate confirmation) resolved before Sprint 1 planning.**
 
-| Sprint | Objective | Stories | Milestone |
-|---|---|---|---|
-| **Sprint 1 — Foundation** | Decisions ratified; deployable skeleton; schema; auth begins | F-1..F-7, C-1 (start) | B1 (infra half) |
-| **Sprint 2 — Accounts & Consent** | Gate B1 passes in production | A-1..A-5, C-1 (done), C-3 | B1 complete |
-| **Sprint 3 — Content & Player** | Pilot course playable end-to-end with progress | L-1..L-6, C-2 | B2 |
-| **Sprint 4 — Billing & Data Rights** | Gate B3: full purchase lifecycle + export/deletion | B-1..B-4, C-4, C-5 | B3 |
-| *(Sprint 5)* | Parent dashboard, admin, photo upload, launch prep | P-1, P-3, L-7, C-5 finish | B3/B4 |
-| *(Sprint 6)* | Beta, migration, launch; badges, report, second course | B4 checklist, G-1..G-3, P-2 | B4/B5 |
+| Sprint                               | Objective                                                    | Stories                     | Milestone       |
+| ------------------------------------ | ------------------------------------------------------------ | --------------------------- | --------------- |
+| **Sprint 1 — Foundation**            | Decisions ratified; deployable skeleton; schema; auth begins | F-1..F-7, C-1 (start)       | B1 (infra half) |
+| **Sprint 2 — Accounts & Consent**    | Gate B1 passes in production                                 | A-1..A-5, C-1 (done), C-3   | B1 complete     |
+| **Sprint 3 — Content & Player**      | Pilot course playable end-to-end with progress               | L-1..L-6, C-2               | B2              |
+| **Sprint 4 — Billing & Data Rights** | Gate B3: full purchase lifecycle + export/deletion           | B-1..B-4, C-4, C-5          | B3              |
+| _(Sprint 5)_                         | Parent dashboard, admin, photo upload, launch prep           | P-1, P-3, L-7, C-5 finish   | B3/B4           |
+| _(Sprint 6)_                         | Beta, migration, launch; badges, report, second course       | B4 checklist, G-1..G-3, P-2 | B4/B5           |
 
 Sprints 5–6 are shown for context; only 1–4 are committed by this report, per the deliverable
 spec. If capacity is a single part-time founder, double the calendar (the roadmap doc itself
@@ -638,18 +638,18 @@ says so).
 
 ## 20. Risk Register
 
-| ID | Risk | Likelihood | Impact | Mitigation | Priority |
-|---|---|---|---|---|---|
-| R-1 | **Building before validating:** the project's own roadmap gates custom development on Phase A (≥10 paying families). Starting Sprint 1 feature work without a Go decision risks months of unvalidated build | Medium | High | F-2: explicit product-owner confirmation that Phase A passed, is running in parallel, or is deliberately waived — documented in ADR/decision log | **P0** |
-| R-2 | Cross-account authorization bug exposes one family's child data to another | Medium (if conventional) | Critical | C-1 structural authorization; cross-account tests in DoD; security review before B4 migration | **P0** |
-| R-3 | Child PII handled without valid parental consent (GDPR Art. 8) | Low (design is good) | Critical | A-2 consent flow with timestamps; data-minimized schema; C-5 paperwork | P1 |
-| R-4 | Third-party trackers/embeds enter the child area via a dependency or embed | Medium | High | C-4 CSP + CI test; no-YouTube rule; dependency review | P1 |
-| R-5 | Solo-founder bus factor and capacity volatility | High | High | Boring stack, managed services, small sprints, docs current; nothing exotic to hand over | P1 |
-| R-6 | Stripe webhook mishandling (missed/duplicated events) grants or revokes access wrongly | Medium | Medium | B-2 idempotency + signature verification + replay tests | P2 |
-| R-7 | MDX content pipeline schema drift breaks lessons at runtime | Medium | Medium | C-2 CI validation from first lesson; versioned widget payloads | P2 |
-| R-8 | Public repo + MDX-as-CMS leaks paid course content | Medium | Medium | F-1 visibility decision: private repo or separate private content repo | P2 |
-| R-9 | Hosting/provider choice churn (Vercel↔Hetzner, Supabase↔Neon) after code is written | Low | Medium | F-3 ADR-001 decides once, with drivers recorded; portable choices (Next.js, Postgres) keep exit cost low | P3 |
-| R-10 | Planning docs (German, side branch) diverge from what gets built | Medium | Low | F-1 merge; docs updated in the same PR as behavior changes (DoD) | P3 |
+| ID   | Risk                                                                                                                                                                                                        | Likelihood               | Impact   | Mitigation                                                                                                                                       | Priority |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | -------- |
+| R-1  | **Building before validating:** the project's own roadmap gates custom development on Phase A (≥10 paying families). Starting Sprint 1 feature work without a Go decision risks months of unvalidated build | Medium                   | High     | F-2: explicit product-owner confirmation that Phase A passed, is running in parallel, or is deliberately waived — documented in ADR/decision log | **P0**   |
+| R-2  | Cross-account authorization bug exposes one family's child data to another                                                                                                                                  | Medium (if conventional) | Critical | C-1 structural authorization; cross-account tests in DoD; security review before B4 migration                                                    | **P0**   |
+| R-3  | Child PII handled without valid parental consent (GDPR Art. 8)                                                                                                                                              | Low (design is good)     | Critical | A-2 consent flow with timestamps; data-minimized schema; C-5 paperwork                                                                           | P1       |
+| R-4  | Third-party trackers/embeds enter the child area via a dependency or embed                                                                                                                                  | Medium                   | High     | C-4 CSP + CI test; no-YouTube rule; dependency review                                                                                            | P1       |
+| R-5  | Solo-founder bus factor and capacity volatility                                                                                                                                                             | High                     | High     | Boring stack, managed services, small sprints, docs current; nothing exotic to hand over                                                         | P1       |
+| R-6  | Stripe webhook mishandling (missed/duplicated events) grants or revokes access wrongly                                                                                                                      | Medium                   | Medium   | B-2 idempotency + signature verification + replay tests                                                                                          | P2       |
+| R-7  | MDX content pipeline schema drift breaks lessons at runtime                                                                                                                                                 | Medium                   | Medium   | C-2 CI validation from first lesson; versioned widget payloads                                                                                   | P2       |
+| R-8  | Public repo + MDX-as-CMS leaks paid course content                                                                                                                                                          | Medium                   | Medium   | F-1 visibility decision: private repo or separate private content repo                                                                           | P2       |
+| R-9  | Hosting/provider choice churn (Vercel↔Hetzner, Supabase↔Neon) after code is written                                                                                                                         | Low                      | Medium   | F-3 ADR-001 decides once, with drivers recorded; portable choices (Next.js, Postgres) keep exit cost low                                         | P3       |
+| R-10 | Planning docs (German, side branch) diverge from what gets built                                                                                                                                            | Medium                   | Low      | F-1 merge; docs updated in the same PR as behavior changes (DoD)                                                                                 | P3       |
 
 ---
 
@@ -658,11 +658,13 @@ says so).
 Applies to every story from Sprint 1 onward. A story is Done only when:
 
 **Code quality**
+
 - TypeScript strict passes; ESLint/Prettier clean; CI green.
 - Follows the layering convention (route → service → repository) and feature-folder layout.
 - No `any` without justification; no TODOs without a linked backlog item.
 
 **Testing**
+
 - Unit tests for service-layer logic; integration tests for API routes touching the DB.
 - **Every endpoint that reads or writes account/child data has a cross-account
   authorization test** (attempt access with a different account → 403/404).
@@ -670,18 +672,22 @@ Applies to every story from Sprint 1 onward. A story is Done only when:
 - No failing or skipped tests on `main`.
 
 **Security & privacy**
+
 - Input validated with zod at the boundary; no PII in logs or Sentry.
 - No new third-party requests from child-area pages (CSP test passes).
 - Schema changes reviewed against data-minimization rules (no child email/full name/DOB).
 
 **Accessibility**
+
 - Keyboard operable; axe checks pass; touch targets ≥44 px in child UI; captions on video.
 
 **Performance**
+
 - Lesson pages remain statically generated; no N+1 introduced (checked in review);
   lesson-page JS stays under the agreed budget.
 
 **Documentation & deployment**
+
 - README/CONTRIBUTING/ADRs updated if behavior or decisions changed; `.env.example` current.
 - Migrations are forward-only and applied in preview; feature works on a preview deployment.
 - Reviewed and merged to `main` via PR with green CI; deployable at all times.
@@ -693,10 +699,11 @@ Applies to every story from Sprint 1 onward. A story is Done only when:
 **Sprint goal:** understand everything before changing anything. **Achieved.**
 
 **Delivered:**
+
 - Complete repository discovery: `main` is pre-code; all prior work identified (two planning
   docs on a side branch); no issues/PRs; no secrets in history.
 - This 24-section engineering report, including audits of every requested dimension (with
-  honest "N/A — does not exist yet" verdicts where applicable), a review of the *proposed*
+  honest "N/A — does not exist yet" verdicts where applicable), a review of the _proposed_
   architecture, a 33-story product backlog under 7 epics (~135 pts), a 4-sprint roadmap
   mapped to the existing milestone plan, a 10-item risk register, and a Definition of Done.
 - A README for the repository (previously missing — created as permitted "create missing
@@ -710,13 +717,15 @@ to trivially fix.
 ## 23. Sprint Retrospective (Sprint 0)
 
 **What went well**
+
 - Discovery was fast and exhaustive because the surface is small; zero ambiguity remains
   about the repo's true state.
 - The pre-existing planning documents are high quality and removed the need to invent an
-  architecture — Sprint 0 could *validate and operationalize* instead of speculate.
+  architecture — Sprint 0 could _validate and operationalize_ instead of speculate.
 - The audit found the plan and the stated product vision to be mutually consistent.
 
 **What was learned**
+
 - The most important risks here are not technical; they are sequencing (R-1: build vs.
   validate) and child-data safety (R-2/R-3). Both are addressable by process decisions
   before code exists — the cheapest possible time.
@@ -724,6 +733,7 @@ to trivially fix.
   decisions aren't yet captured where contributors look. Hence ADRs (F-3, D-5).
 
 **What to improve going forward**
+
 - Capture decisions as ADRs in-repo rather than in chat/branches.
 - Keep planning docs on `main` and evolve them with the code (DoD covers this).
 - Establish the English-vs-German documentation policy when the first additional
@@ -731,13 +741,14 @@ to trivially fix.
 
 ## 24. Recommendation for Sprint 1
 
-**Sprint goal:** *"A deployable, CI-guarded foundation with ratified decisions and the core
-schema — ready for accounts."*
+**Sprint goal:** _"A deployable, CI-guarded foundation with ratified decisions and the core
+schema — ready for accounts."_
 
 **Before planning:** resolve F-2 (Phase A gate status) with the product owner. This is a
 one-conversation item and de-risks the entire build (R-1).
 
 **Committed scope (≈21 pts):**
+
 1. **F-1** Merge planning docs to `main`; decide repo visibility (1)
 2. **F-3** ADR-001: stack, hosting, DB provider, auth provider (2)
 3. **F-4** Scaffold: Next.js + TS strict, ESLint/Prettier, Vitest, Playwright, GitHub

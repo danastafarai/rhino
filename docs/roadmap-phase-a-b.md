@@ -43,6 +43,7 @@ Ergänzung zu [`edtech-mvp-architektur.md`](./edtech-mvp-architektur.md). Annahm
 - [ ] Entscheidung dokumentiert: Go Phase B / Pivot (Thema, Alter, Format) / Stop
 
 **Gate A→B (alle drei müssen erfüllt sein):**
+
 1. **≥ 10 zahlende Familien** zum Zielpreis (nicht Freunde/Familie)
 2. **≥ 50 % der gestarteten Kinder** erreichen mindestens die Hälfte des Kurses
 3. Mindestens **3 Eltern sagen unaufgefordert**, sie würden einen zweiten Kurs kaufen
@@ -105,6 +106,7 @@ Wird das Gate verfehlt: erst Angebot/Format iterieren (zurück zu A2/A3), **nich
 - [ ] Kennzahlen-Dashboard light: 5–6 SQL-Abfragen für Aktivierung, Abschlussquote, Churn
 
 **Gate B→C (Kriterien für den Start der Skalierungsphase, Richtwerte):**
+
 - ≥ 100 aktive Familien **oder** ≥ 2.000 € MRR
 - ≥ 2 Kurse live, Abschlussquote stabil ≥ 40 %
 - Ein manueller Prozess (Support, Feedback, Content-Onboarding) kostet nachweislich > 1 Tag/Woche → erst dann dessen Automatisierung bzw. den passenden Phase-C-Baustein angehen
@@ -113,19 +115,20 @@ Wird das Gate verfehlt: erst Angebot/Format iterieren (zurück zu A2/A3), **nich
 
 ## Übersicht
 
-| Woche | Meilenstein | Ergebnis |
-|---|---|---|
-| 1 | A1 | Angebot + Landing Page live |
-| 3 | A2 | Kurs kaufbar, von Testkind durchlaufen |
-| 4–5 | A3 | Erste zahlende Familien, Concierge-Betrieb |
-| 6 | A4 / **Gate A→B** | Go/Pivot/Stop-Entscheidung |
-| 9 | B1 | Auth, Eltern-/Kind-Konten, Einwilligung, Infra |
-| 13 | B2 | MDX-Pipeline + Lern-Player mit Fortschritt |
-| 17 | B3 | Stripe, Eltern-Dashboard, Export/Löschung |
-| 20 | B4 | Migration der Bestandskunden, Launch |
-| 22 | B5 / **Gate B→C** | Zweiter Kurs, Basics automatisiert |
+| Woche | Meilenstein       | Ergebnis                                       |
+| ----- | ----------------- | ---------------------------------------------- |
+| 1     | A1                | Angebot + Landing Page live                    |
+| 3     | A2                | Kurs kaufbar, von Testkind durchlaufen         |
+| 4–5   | A3                | Erste zahlende Familien, Concierge-Betrieb     |
+| 6     | A4 / **Gate A→B** | Go/Pivot/Stop-Entscheidung                     |
+| 9     | B1                | Auth, Eltern-/Kind-Konten, Einwilligung, Infra |
+| 13    | B2                | MDX-Pipeline + Lern-Player mit Fortschritt     |
+| 17    | B3                | Stripe, Eltern-Dashboard, Export/Löschung      |
+| 20    | B4                | Migration der Bestandskunden, Launch           |
+| 22    | B5 / **Gate B→C** | Zweiter Kurs, Basics automatisiert             |
 
 **Prinzipien über die ganze Roadmap:**
+
 - Phase A läuft während B weiter — Verkauf und Lernen stoppen nie.
 - Scope-Disziplin: Was nicht auf dieser Liste steht (Mobile-App, Community, KI, Ranglisten), wird in einer „Später"-Liste geparkt, nicht diskutiert.
 - Jedes Gate wird schriftlich entschieden — auch ein „Nein" ist ein Ergebnis der Validierung.
