@@ -103,6 +103,18 @@ build across Node 20.x and 22.x. See [`.github/workflows/ci.yml`](./.github/work
 The prioritized product backlog lives at the bottom of the latest sprint document in
 [`docs/scrum/`](./docs/scrum/).
 
+## Other planning documents in this repository
+
+The repository also carries planning material for a separate **EdTech learning platform**
+concept, merged from earlier branches. It describes a different product from the game above and
+no code for it exists here:
+
+| Document                                                           | Purpose                                                     |
+| ------------------------------------------------------------------ | ----------------------------------------------------------- |
+| [`docs/sprint-0-report.md`](docs/sprint-0-report.md)               | Sprint 0 engineering audit, backlog and risk register       |
+| [`docs/edtech-mvp-architektur.md`](docs/edtech-mvp-architektur.md) | MVP architecture: stack, data model, GDPR strategy (German) |
+| [`docs/roadmap-phase-a-b.md`](docs/roadmap-phase-a-b.md)           | Phase A/B milestone roadmap with Go/No-Go gates (German)    |
+
 ## License
 
 See [LICENSE](./LICENSE).
